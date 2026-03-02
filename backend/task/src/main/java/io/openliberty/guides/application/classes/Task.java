@@ -1,4 +1,4 @@
-package io.openliberty.guides.application;
+package io.openliberty.guides.application.classes;
 
 import jakarta.validation.constraints.NotEmpty;
 

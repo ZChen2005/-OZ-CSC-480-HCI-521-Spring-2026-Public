@@ -3,6 +3,7 @@ package io.openliberty.guides.application;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -16,6 +17,7 @@ import org.bson.Document;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
+import io.openliberty.guides.application.classes.Task;
 
 import java.io.StringWriter;
 import java.util.Set;
@@ -23,6 +25,8 @@ import java.util.Set;
 /**
  * TaskService implementation for use with REST API functions. Adapted from the code seen in CrewService.java, to be changed as needed
  */
+@Path("/")
+@ApplicationScoped
 public class TaskService {
 
     @Inject
