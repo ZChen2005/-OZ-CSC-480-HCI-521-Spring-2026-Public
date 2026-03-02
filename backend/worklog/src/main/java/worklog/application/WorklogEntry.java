@@ -3,7 +3,7 @@ package worklog.application;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
-
+import java.util.HashMap;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -28,6 +28,7 @@ public class WorklogEntry {
 
     @NotNull(message = "Need tasks!")
     private HashMap<String, Task> taskList;
+
 
     public void setAuthorName(String name) {
         this.authorName = name;
