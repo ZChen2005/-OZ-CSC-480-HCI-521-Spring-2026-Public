@@ -28,7 +28,7 @@ public class WorklogEntry {
     @Valid
     private List<@NotEmpty @Size(max = 50) String> collaborators; 
 
-    // @NotNull(message = "Need tasks!")
+    @NotNull(message = "Need tasks!")
     private HashMap<String, Task> taskList;
 
 
