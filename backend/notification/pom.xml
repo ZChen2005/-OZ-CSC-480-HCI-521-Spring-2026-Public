@@ -16,10 +16,10 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <!-- tag::defaultHttpPort[] -->
-        <liberty.var.http.port>9082</liberty.var.http.port>
+        <liberty.var.http.port>9083</liberty.var.http.port>
         <!-- end::defaultHttpPort[] -->
         <!-- tag::defaultHttpsPort[] -->
-        <liberty.var.https.port>9443</liberty.var.https.port>
+        <liberty.var.https.port>9442</liberty.var.https.port>
         <!-- end::defaultHttpsPort[] -->
         <app.name>${project.artifactId}</app.name>
         <!-- tag::appContextRoot[] -->
