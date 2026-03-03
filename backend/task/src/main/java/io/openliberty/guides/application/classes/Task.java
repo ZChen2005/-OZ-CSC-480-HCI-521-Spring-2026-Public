@@ -1,5 +1,6 @@
 package io.openliberty.guides.application.classes;
 
+import jakarta.enterprise.inject.Default;
 import jakarta.validation.constraints.NotEmpty;
 
 public class Task {
@@ -24,7 +25,7 @@ public class Task {
     public String getGoal() { return goal; }
     public void setGoal(String goal) { this.goal = goal; }
     public String getAssignedName() { return assignedName; }
-    public void setAssignedName() { this.assignedName = assignedName; }
+    public void setAssignedName(String assignedName) { this.assignedName = assignedName; }
     public String getDeadline() { return deadline; }
     public void setDeadline(String deadline) { this.deadline = deadline; }
     public String getStatus() { return status; }
