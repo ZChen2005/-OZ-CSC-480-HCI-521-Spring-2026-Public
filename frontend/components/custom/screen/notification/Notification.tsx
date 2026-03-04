@@ -49,7 +49,7 @@ export const Notification = () => {
             <CardTitle className="text-2xl">Work Log</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {worklogs.map((log: any, i: number) => (
+            {worklogs?.map((log: any, i: number) => (
               <div key={i} className="border rounded-lg px-4 py-3">
                 <p className="text-md font-medium">
                   Work Log submitted on {log.dateSubmitted}
@@ -66,10 +66,10 @@ export const Notification = () => {
             <CardTitle className="text-2xl">Task Tracker</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {incompleteTasks.length === 0 ? (
+            {incompleteTasks?.length === 0 ? (
               <p className="text-gray-500">All tasks are complete!</p>
             ) : (
-              incompleteTasks.map((task: any, i: number) => (
+              incompleteTasks?.map((task: any, i: number) => (
                 <div key={i} className="border rounded-lg px-4 py-3">
                   <p className="text-md font-semibold">{task.taskName}</p>
                   <p className="text-md text-gray-600">
