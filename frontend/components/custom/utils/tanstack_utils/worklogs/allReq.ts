@@ -12,3 +12,8 @@ export async function submitWorkLog(data: workLogPostType) {
   const res = await axios.post(API_BASE, data);
   return res.data;
 }
+
+export async function getWorkLog(authorName: string) {
+  const res = await axios.get(`${API_BASE}/author/${authorName}`);
+  return res.data;
+}
