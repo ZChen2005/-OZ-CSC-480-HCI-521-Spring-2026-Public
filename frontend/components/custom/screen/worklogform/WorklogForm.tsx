@@ -3,8 +3,11 @@
 import * as React from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
-import * as z from "zod";
 
+import {
+  workLogPostSchema,
+  workLogPostType,
+} from "@/types/worklog/worklogTypes";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -34,26 +37,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const taskSchema = z.object({
-  taskName: z.string().min(1, "Task name is required"),
-  mainGoal: z.string().min(1, "Main goal is required"),
-  collaborators: z.string(),
-  deadline: z.string().min(1, "Deadline is required"),
-  completion: z.enum(["not-started", "in-progress", "complete"], {
-    required_error: "Select completion status",
-  }),
-  reflection: z
-    .string()
-    .min(1, "Reflection is required")
-    .max(500, "Reflection must be at most 500 characters."),
-});
-
-const formSchema = z.object({
-  tasks: z.array(taskSchema).min(1, "At least one task is required"),
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
 const emptyTask = {
   taskName: "",
   mainGoal: "",
@@ -64,8 +47,8 @@ const emptyTask = {
 };
 
 export function WorkLogForm() {
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<workLogPostType>({
+    resolver: zodResolver(workLogPostSchema),
     defaultValues: {
       tasks: [emptyTask],
     },
@@ -76,7 +59,7 @@ export function WorkLogForm() {
     name: "tasks",
   });
 
-  function onSubmit(data: FormValues) {
+  function onSubmit(data: workLogPostType) {
     console.log("Submitted:", data);
   }
 
