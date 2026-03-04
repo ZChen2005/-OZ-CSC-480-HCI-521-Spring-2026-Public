@@ -2,9 +2,11 @@ import * as z from "zod";
 
 export const taskSchema = z.object({
   taskName: z.string().min(1, "Task name is required"),
-  mainGoal: z.string().min(1, "Main goal is required"),
-  collaborators: z.string(),
-  deadline: z.string().min(1, "Deadline is required"),
+  goal: z.string().min(1, "Main goal is required"),
+  collaborators: z.array(z.string()),
+  assignedUser: z.string(),
+  creationDate: z.string(),
+  dueDate: z.string().min(1, "Deadline is required"),
   completion: z.enum(["not-started", "in-progress", "complete"], {
     required_error: "Select completion status",
   }),
@@ -15,7 +17,16 @@ export const taskSchema = z.object({
 });
 
 export const workLogPostSchema = z.object({
+  authorName: z.string(),
+  dateCreated: z.string(),
+  dateSubmitted: z.string(),
+  collaborators: z.array(z.string()),
+  taskList: z.array(taskSchema).min(1, "At least one task is required"),
+});
+
+export const tasksSchema = z.object({
   tasks: z.array(taskSchema).min(1, "At least one task is required"),
 });
 
+export type taskType = z.infer<typeof tasksSchema>;
 export type workLogPostType = z.infer<typeof workLogPostSchema>;

@@ -1,4 +1,5 @@
 "use client";
+import React, { useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
@@ -7,16 +8,12 @@ import { submitWorkLog } from "../../utils/tanstack_utils/worklogs/allReq";
 import {
   workLogPostSchema,
   workLogPostType,
+  taskType,
+  tasksSchema,
 } from "@/types/worklog/worklogTypes";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Field,
   FieldError,
@@ -37,43 +34,71 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const emptyTask = {
-  taskName: "",
-  mainGoal: "",
-  collaborators: "",
-  deadline: "",
-  completion: undefined as unknown as "not-started",
-  reflection: "",
-};
+import { useAtomValue } from "jotai";
+import { sessionIdAtom } from "@/components/custom/utils/context/state";
 
 export function WorkLogForm() {
-  const form = useForm<workLogPostType>({
-    resolver: zodResolver(workLogPostSchema),
+  const [showSuccess, setShowSuccess] = useState(false);
+  const dateCreated = new Date().toISOString().split("T")[0];
+  const sessionId = useAtomValue(sessionIdAtom);
+
+  const emptyTask = {
+    taskName: "",
+    goal: "",
+    collaborators: [] as string[],
+    assignedUser: sessionId,
+    completion: undefined as unknown as "not-started",
+    dueDate: "",
+    creationDate: dateCreated,
+    reflection: "",
+  };
+
+  const form = useForm<taskType>({
+    resolver: zodResolver(tasksSchema),
     defaultValues: {
       tasks: [emptyTask],
     },
   });
-  const mutation = useMutation({ mutationFn: submitWorkLog });
+
+  const mutation = useMutation({
+    mutationFn: submitWorkLog,
+    onSuccess: () => {
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+      form.reset({ tasks: [emptyTask] });
+    },
+  });
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "tasks",
   });
 
-  function onSubmit(data: workLogPostType) {
-    console.log(data);
-    // mutation.mutate()
+  function onSubmit(data: taskType) {
+    const obj: workLogPostType = {
+      authorName: sessionId,
+      dateCreated: dateCreated,
+      dateSubmitted: dateCreated,
+      collaborators: [],
+      taskList: data.tasks,
+    };
+    mutation.mutate(obj);
   }
 
   return (
-    // <div className="max-w-4xl mx-auto py-10 px-4">
     <div className="p-10">
+      {showSuccess && (
+        <div className="fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-in fade-in slide-in-from-top-2">
+          Work log submitted successfully!
+        </div>
+      )}
+
       <h1 className="text-4xl font-bold mb-8">Work Logs</h1>
 
       <Card className="w-full">
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="text-2xl">Weekly Work Log 3</CardTitle>
-          <div className=" grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4">
             <Button
               type="button"
               variant="ghost"
@@ -88,7 +113,12 @@ export function WorkLogForm() {
         </CardHeader>
 
         <CardContent className="max-h-[70vh] overflow-y-auto">
-          <form id="worklog-form" onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            id="worklog-form"
+            onSubmit={form.handleSubmit(onSubmit, (errors) =>
+              console.log("Validation errors:", errors),
+            )}
+          >
             <div className="space-y-8">
               {fields.map((field, index) => (
                 <Card key={field.id} className="relative">
@@ -118,7 +148,7 @@ export function WorkLogForm() {
                           />
 
                           <Controller
-                            name={`tasks.${index}.mainGoal`}
+                            name={`tasks.${index}.goal`}
                             control={form.control}
                             render={({ field, fieldState }) => (
                               <Field data-invalid={fieldState.invalid}>
@@ -138,20 +168,70 @@ export function WorkLogForm() {
                           <Controller
                             name={`tasks.${index}.collaborators`}
                             control={form.control}
-                            render={({ field, fieldState }) => (
-                              <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel>Collaborators</FieldLabel>
-                                <Input
-                                  {...field}
-                                  placeholder="Collaborators"
-                                  aria-invalid={fieldState.invalid}
-                                />
-                              </Field>
-                            )}
+                            render={({ field }) => {
+                              const [input, setInput] = React.useState("");
+                              return (
+                                <Field>
+                                  <FieldLabel>Collaborators</FieldLabel>
+                                  <div className="flex flex-wrap gap-2 mb-2">
+                                    {field.value
+                                      .filter((name) => name !== "")
+                                      .map((name, i) => (
+                                        <span
+                                          key={i}
+                                          className="flex items-center gap-1 bg-gray-200 text-sm px-2 py-1 rounded-full"
+                                        >
+                                          {name}
+                                          <button
+                                            type="button"
+                                            className="text-gray-500 hover:text-red-500"
+                                            onClick={() =>
+                                              field.onChange(
+                                                field.value.filter(
+                                                  (_, j) => j !== i,
+                                                ),
+                                              )
+                                            }
+                                          >
+                                            ×
+                                          </button>
+                                        </span>
+                                      ))}
+                                  </div>
+                                  <Input
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (
+                                        (e.key === "Enter" || e.key === ",") &&
+                                        input.trim()
+                                      ) {
+                                        e.preventDefault();
+                                        field.onChange([
+                                          ...field.value,
+                                          input.trim(),
+                                        ]);
+                                        setInput("");
+                                      }
+                                      if (
+                                        e.key === "Backspace" &&
+                                        input === "" &&
+                                        field.value.length > 0
+                                      ) {
+                                        field.onChange(
+                                          field.value.slice(0, -1),
+                                        );
+                                      }
+                                    }}
+                                    placeholder="Type a name and press Enter"
+                                  />
+                                </Field>
+                              );
+                            }}
                           />
 
                           <Controller
-                            name={`tasks.${index}.deadline`}
+                            name={`tasks.${index}.dueDate`}
                             control={form.control}
                             render={({ field, fieldState }) => (
                               <Field data-invalid={fieldState.invalid}>

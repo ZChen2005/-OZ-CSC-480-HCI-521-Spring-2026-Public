@@ -16,11 +16,11 @@ public class WorklogEntry {
     @NotEmpty(message = "Worklog must have an author!")
     private String authorName;
 
-    @PastOrPresent(message = "Can't be created in the future")
+    // @PastOrPresent(message = "Can't be created in the future")
     @NotNull(message = "Date created required")
     private LocalDate dateCreated;
 
-    @PastOrPresent(message = "Can't be submitted in the future")
+    // @PastOrPresent(message = "Can't be submitted in the future")
     private LocalDate dateSubmitted;
 
     @Valid
