@@ -1,6 +1,5 @@
-package io.openliberty.guides.application.classes;
+package task.application.classes;
 
-import jakarta.enterprise.inject.Default;
 import jakarta.validation.constraints.NotEmpty;
 
 public class Task {

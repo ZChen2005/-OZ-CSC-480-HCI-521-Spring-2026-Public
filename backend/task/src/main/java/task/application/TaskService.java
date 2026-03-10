@@ -1,4 +1,4 @@
-package io.openliberty.guides.application;
+package task.application;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -17,7 +17,7 @@ import org.bson.Document;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
 import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
-import io.openliberty.guides.application.classes.Task;
+import task.application.classes.Task;
 
 import java.io.StringWriter;
 import java.util.Set;
