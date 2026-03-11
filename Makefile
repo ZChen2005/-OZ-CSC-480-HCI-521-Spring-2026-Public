@@ -92,4 +92,5 @@ clean-backend:
 	cd backend/notification && ./mvnw clean
 
 clean-mongodb:
+	docker rm -f csc480-mongodb-container || true
 	docker compose -f docker-compose.dev.yml down -v
