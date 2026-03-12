@@ -4,8 +4,6 @@ import java.time.LocalDate;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
-import org.eclipse.microprofile.openapi.annotations.responses.APIResponse;
-import org.eclipse.microprofile.openapi.annotations.responses.APIResponses;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -36,8 +34,9 @@ public class WorklogService {
     
 
     @GET
-    @Path("/getall")
+    @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Gets all worklogs in the db")
     public Response getAllWorklogs() {
         return repo.getAll();
     }
@@ -45,6 +44,7 @@ public class WorklogService {
     @GET
     @Path("/draft")
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Gets all drafts in the db")
     public Response getCurrentDraft() {
         return repo.getDraft();
     }
@@ -52,13 +52,16 @@ public class WorklogService {
     @GET
     @Path("/author/{authorName}")
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Get worklog by author name in the database.")
     public Response getWorklogByAuthorName(@jakarta.ws.rs.PathParam("authorName") String authorName) {
        return  repo.findByAuthor(authorName);
     }
 
     @POST
+    @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Uploads new worklog to db")
     public Response createWorklog(@Valid WorklogEntry entry) {
 
         // Automatically set dateCreated if not provided
@@ -75,7 +78,7 @@ public class WorklogService {
     @Path("/id/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Operation(summary = "Update worklog draft in the database.")
+    @Operation(summary = "Update worklog draft by mongo ID in the database.")
     public Response updateWorklog(@jakarta.ws.rs.PathParam("id") String id, @Valid WorklogEntry updatedEntry) {
         return repo.updateWorklog(id, updatedEntry);
     }
@@ -87,7 +90,7 @@ public class WorklogService {
     @Path("/draft/{userId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Operation(summary = "Save draft in the database.")
+    @Operation(summary = "Save draft of userID in the database.")
     public Response update(WorklogEntry worklog,
         @Parameter(description = "studentID of owner.",required = true) 
         @PathParam("userId") String userId) {
@@ -98,14 +101,15 @@ public class WorklogService {
 
     @DELETE
     @Path("/delAll")
+    @Operation(summary = "WARNING DELETES *EVERY* WORKLOG")
     public Response deleteAll() {
 
         return repo.deleteAll();
     }
 
-
     @DELETE
     @Path("/id/{id}")
+    @Operation(summary = "Deletes by mongo ID")
     public Response deleteWorklog(@jakarta.ws.rs.PathParam("id") String id) {
         return repo.deleteWorklog(id);
     }
