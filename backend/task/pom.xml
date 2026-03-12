@@ -5,8 +5,8 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.openliberty.guides</groupId>
-    <artifactId>notifier</artifactId>
+    <groupId>task</groupId>
+    <artifactId>task</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
@@ -15,14 +15,15 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <liberty.var.http.port>9080</liberty.var.http.port>
-        <liberty.var.https.port>9443</liberty.var.https.port>
+        <liberty.var.http.port>9082</liberty.var.http.port>
+        <liberty.var.https.port>9445</liberty.var.https.port>
         <app.name>${project.artifactId}</app.name>
-        <liberty.var.app.context.root>/notifier</liberty.var.app.context.root>
+        <liberty.var.app.context.root>/task</liberty.var.app.context.root>
         <package.file>${project.build.directory}/${app.name}.zip</package.file>
     </properties>
 
     <dependencies>
+        <!-- Provided dependencies -->
         <dependency>
             <groupId>jakarta.platform</groupId>
             <artifactId>jakarta.jakartaee-api</artifactId>
@@ -36,23 +37,30 @@
             <type>pom</type>
             <scope>provided</scope>
         </dependency>
+        <!-- tag::passwordUtilDependency[] -->
         <dependency>
             <groupId>com.ibm.websphere.appserver.api</groupId>
             <artifactId>com.ibm.websphere.appserver.api.passwordUtil</artifactId>
             <version>1.0.106</version>
             <scope>provided</scope>
         </dependency>
+        <!-- end::passwordUtilDependency[] -->
+        <!-- tag::sslDependency[] -->
         <dependency>
             <groupId>com.ibm.websphere.appserver.api</groupId>
             <artifactId>com.ibm.websphere.appserver.api.ssl</artifactId>
             <version>1.8.106</version>
             <scope>provided</scope>
         </dependency>
+        <!-- end::sslDependency[] -->
+        <!-- Required dependencies -->
+        <!-- tag::mongoDriver[] -->
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver-sync</artifactId>
             <version>5.6.1</version>
         </dependency>
+        <!-- end::mongoDriver[] -->
         <!-- For tests -->
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
@@ -95,8 +103,8 @@
                 <artifactId>liberty-maven-plugin</artifactId>
                 <version>3.11.5</version>
                 <configuration>
-                    <serverName>notificationManager</serverName>
-                    <libertyDebugPort>7770</libertyDebugPort>
+                    <serverName>taskManager</serverName>
+                    <libertyDebugPort>7772</libertyDebugPort>
                 </configuration>
                 <executions>
                     <execution>

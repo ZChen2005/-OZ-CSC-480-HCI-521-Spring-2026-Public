@@ -41,7 +41,8 @@ docker info    # just checks if Docker Desktop is running
 **Mac/Linux**
 
 ```bash
-   make setup
+   make clean # Remove existing system residue that might conflict with this project
+   make setup # Install required dependencies for frontend, backend and mongodb
 ```
 
 Then start the project:
@@ -64,8 +65,9 @@ Setup Mongodb Container
    docker run --name csc480-mongodb-container -p 27017:27017 -d csc480-mongodb
    timeout /t 5
    cd ..
-   docker cp csc480-mongodb-container:/home/mongodb/certs/truststore.p12 ./backend/finish/src/main/liberty/config/resources/security
+   docker cp csc480-mongodb-container:/home/mongodb/certs/truststore.p12 ./backend/notification/src/main/liberty/config/resources/security
    docker cp csc480-mongodb-container:/home/mongodb/certs/truststore.p12 ./backend/worklog/src/main/liberty/config/resources/security
+   docker cp csc480-mongodb-container:/home/mongodb/certs/truststore.p12 ./backend/task/src/main/liberty/config/resources/security
    docker start csc480-mongodb-container
 ```
 
@@ -80,7 +82,7 @@ Terminal 1 — Frontend:
 Terminal 2 — Backend:
 
 ```bash
-   cd ./backend/finish
+   cd ./backend/notification
    .\mvnw.cmd liberty:dev
 ```
 Terminal 2 — continued:: IF YOU HAVE AN OLD PROCESSOR, you may need to specify your own version of Mongo. (the "name" field can be whatever you want. 4.4 seems to work on processors at least 8 years old.)
@@ -95,13 +97,13 @@ Find this dependency in your POM.xml
 Make sure it matches what is listed above^^^
 Then, run the following:
 ```bash
-   cd ./backend/finish
+   cd ./backend/notification
    docker run -d -p 27017:27017 --name inventory-mongo mongo:4.4
    mvn clean liberty:dev
 ```
 If your POST does not work, try this:
 ```bash
-cd ./backend/finish/src/main/java/io/openliberty/guides/mongo
+cd ./backend/notification/mongo/src/main/java/mongo
 ls
 ```
 You should see MongoProducer and MongoProducerSWAP. One of them is commented out completely. Switch them, then try again:
@@ -118,12 +120,14 @@ Frontend
 - [http://localhost:3000](http://localhost:3000)
 
 Backend
-- finish backend - [http://localhost:9080](http://localhost:9080)
+- notification backend [http://localhost:9080](http://localhost:9080)
 - worklog backend - [http://localhost:9081](http://localhost:9081)
+- task backend - [http://localhost:9082](http://localhost:9082)
 
 Backend documentation 
-- finish backend doc - [http://localhost:9080/openapi/ui](http://localhost:9080/openapi/ui)
+- notification backend doc - [http://localhost:9080/openapi/ui](http://localhost:9080/openapi/ui)
 - worklog backend doc - [http://localhost:9081/openapi/ui](http://localhost:9081/openapi/ui)
+- task backend doc - [http://localhost:9082/openapi/ui](http://localhost:9082/openapi/ui)
 
 ---
 
@@ -152,12 +156,12 @@ Then follow the [Installation](#installation).
 
 ## Writing/Running Tests
 
-From the `backend/finish` directory:
+From the `backend/<microservice>` directory:
 
 **Mac/Linux**
 
 ```bash
-cd ./backend/finish
+cd ./backend/<microservice>
 ./mvnw test      # unit tests only
 ./mvnw verify    # unit + integration tests
 ```
@@ -165,7 +169,7 @@ cd ./backend/finish
 **Windows**
 
 ```bash
-cd ./backend/finish
+cd ./backend/<microservice>
 .\mvnw.cmd test      # unit tests only
 .\mvnw.cmd verify    # unit + integration tests
 ```
@@ -178,6 +182,8 @@ cd ./backend/finish
 
 Check out the OpenAPI UI to explore and test the backend endpoints:
 http://localhost:9080/openapi/ui/
+http://localhost:9081/openapi/ui/
+http://localhost:9082/openapi/ui/
 
 ---
 
@@ -217,6 +223,8 @@ When opening a pull request, include a concise description of the feature or fix
    A previous Liberty process may still be running in the background. Kill it:
 ```bash
    kill -9 $(lsof -t -i :9080)
+   kill -9 $(lsof -t -i :9081)
+   kill -9 $(lsof -t -i :9082)
    kill -9 $(lsof -t -i :3000)
 ```
 

@@ -1,4 +1,4 @@
-<server description="Notification Microservice">
+<server description="Task server">
     <featureManager>
         <platform>jakartaee-10.0</platform>
         <platform>microprofile-7.1</platform>
@@ -12,7 +12,6 @@
         <feature>mpOpenAPI</feature>
     </featureManager>
 
-    <!-- cors allowed -->
     <cors domain="*"
         allowedOrigins="*"
         allowedMethods="GET, POST, PUT, DELETE, OPTIONS"
@@ -30,17 +29,13 @@
 
     <!-- tag::webApplication[] -->
     <webApplication
-        location="notifier.war"
+        location="task.war"
         contextRoot="${app.context.root}"
     />
     <!-- end::webApplication[] -->
-
-
     <variable name="mongo.hostname" value="localhost" />
     <variable name="mongo.port" value="27017" />
     <variable name="mongo.dbname" value="appdb" />
     <variable name="mongo.username" value="appuser" />
     <variable name="mongo.password" value="secret123" />
-
-
 </server>
