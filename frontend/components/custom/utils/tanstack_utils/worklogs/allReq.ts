@@ -6,7 +6,7 @@ import axios from "axios";
 
 const API_BASE =
   process.env.NEXT_PUBLIC_WORKLOGS_API_URL ||
-  "http://localhost:9081/worklog/api/v2";
+  "http://localhost:9081/worklog/api/";
 
 export async function submitWorkLog(data: workLogPostType) {
   const res = await axios.post(API_BASE, data);

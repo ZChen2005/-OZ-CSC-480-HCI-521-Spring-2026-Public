@@ -2,29 +2,20 @@ package worklog.application;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.bson.codecs.pojo.annotations.BsonId;
-import org.bson.types.ObjectId;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
 import worklog.application.classes.Task;
-import java.util.HashMap;
 
 public class WorklogEntry {
-
-    @BsonId
-    private ObjectId id;
 
     @NotEmpty(message = "Worklog must have an author!")
     private String authorName;
 
-    // @PastOrPresent(message = "Can't be created in the future")
     @NotNull(message = "Date created required")
     private LocalDate dateCreated;
 
-    // @PastOrPresent(message = "Can't be submitted in the future")
     private LocalDate dateSubmitted;
 
     @Valid
@@ -33,6 +24,7 @@ public class WorklogEntry {
     @NotNull(message = "Need tasks!")
     private List<Task> taskList;
 
+    private boolean isDraft;
 
     public void setAuthorName(String name) {
         this.authorName = name;
@@ -74,12 +66,13 @@ public class WorklogEntry {
         return taskList;
     }
 
-    public void setId(ObjectId id) {
-        this.id = id;
+    public void setisDraft(boolean isDraft) {
+        this.isDraft = isDraft;
     }
 
-    public ObjectId getId() {
-        return id;
+    public boolean getisDraft() {
+        return isDraft;
     }
+
 
 }

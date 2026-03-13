@@ -34,7 +34,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("/notifications") //LANDON: Most of this is kinda adapted from the crewmember endpoint. Once the actual Task objects have been created, we can comfortably create that "automatic notification formulation" functionality that is supposed to build notifications automatically based on which task logs are incomplete.
+@Path("/") //LANDON: Most of this is kinda adapted from the crewmember endpoint. Once the actual Task objects have been created, we can comfortably create that "automatic notification formulation" functionality that is supposed to build notifications automatically based on which task logs are incomplete.
 @ApplicationScoped      //FOR NOW, this is just a plain endpoint that allows for manual notification generation, list, and deletion.
 public class NotificationService {
 
