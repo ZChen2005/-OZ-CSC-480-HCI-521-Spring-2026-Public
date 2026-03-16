@@ -10,33 +10,23 @@ Make sure you have the following installed before getting started:
 - [Docker](https://www.docker.com/products/docker-desktop)
 - Maven (or use the included `mvnw` wrapper — no install needed)
 
-**Mac/Linux**
-
-```bash
-   make check-deps # Check if you have all dependencies installed.
-```
-
-**Windows**
-```
-where docker   # v20+
-where npm      # v9+
-where java     # v21+
-where git      # v2+
-docker info    # just checks if Docker Desktop is running
-```
-
 ## Cloning the project
 
-1. Clone the repository and navigate into it:
+Clone the repository and navigate into it:
 
    ```bash
    git clone https://github.com/Paul-Austin-Oswego-CSC480-HCI521/-OZ-CSC-480-HCI-521-Spring-2026-Public
    cd ./-OZ-CSC-480-HCI-521-Spring-2026-Public
    ```
+   **Mac/Linux**
+
+   ```bash
+      make check-deps # Check if you have all dependencies installed.
+   ```
 
 ## Installation
 
-2. Install dependencies and run the project:
+Install dependencies and run the project:
 
 **Mac/Linux**
 
@@ -54,65 +44,7 @@ Open three separate terminals:
    make dev-frontend   # Terminal 1 — Frontend
    make dev-backend    # Terminal 2 — Backend
 ```
-
-**Windows**
-
-Setup Mongodb Container
-
-```bash
-   docker rm -f csc480-mongodb-container
-   cd backend && docker build -t csc480-mongodb -f assets/Dockerfile .
-   docker run --name csc480-mongodb-container -p 27017:27017 -d csc480-mongodb
-   timeout /t 5
-   cd ..
-   docker cp csc480-mongodb-container:/home/mongodb/certs/truststore.p12 ./backend/notification/src/main/liberty/config/resources/security
-   docker cp csc480-mongodb-container:/home/mongodb/certs/truststore.p12 ./backend/worklog/src/main/liberty/config/resources/security
-   docker cp csc480-mongodb-container:/home/mongodb/certs/truststore.p12 ./backend/task/src/main/liberty/config/resources/security
-   docker start csc480-mongodb-container
-```
-
-Terminal 1 — Frontend:
-
-```bash
-   cd ./frontend
-   npm install
-   npm run dev
-```
-
-Terminal 2 — Backend:
-
-```bash
-   cd ./backend/notification
-   .\mvnw.cmd liberty:dev
-```
-Terminal 2 — continued:: IF YOU HAVE AN OLD PROCESSOR, you may need to specify your own version of Mongo. (the "name" field can be whatever you want. 4.4 seems to work on processors at least 8 years old.)
-Find this dependency in your POM.xml
-```xml
-   <dependency>
-      <groupId>org.mongodb</groupId>
-      <artifactId>mongodb-driver-sync</artifactId>
-      <version>4.11.1</version>
-   </dependency>
-```
-Make sure it matches what is listed above^^^
-Then, run the following:
-```bash
-   cd ./backend/notification
-   docker run -d -p 27017:27017 --name inventory-mongo mongo:4.4
-   mvn clean liberty:dev
-```
-If your POST does not work, try this:
-```bash
-cd ./backend/notification/mongo/src/main/java/mongo
-ls
-```
-You should see MongoProducer and MongoProducerSWAP. One of them is commented out completely. Switch them, then try again:
-```bash
-   cd ./backend/finish
-   docker run -d -p 27017:27017 --name inventory-mongo mongo:4.4
-   mvn clean liberty:dev
-```
-If that does not work, then either you have a VPN running, or your machine supports neither the old Mongo version, nor the latest, and you might want to consider asking an AI to help you out with your precise machine. Ask Landon on discord for help as a last resort. 
+ > You can run `make dev` for running all project in one go. Not recommended for development
 
 ## Endpoints
 
@@ -138,17 +70,6 @@ During weekly sprints, the full stack team will tag a release when ready.
 1. Download the desired releases by going to [Link](https://github.com/Paul-Austin-Oswego-CSC480-HCI521/-OZ-CSC-480-HCI-521-Spring-2026-Public/releases)
 
 2. Open the folder in your code editor
-
-**Mac/Linux**
-```
-   make clean
-```
-
-**Windows**
-```
-   docker rm -fv csc480-mongodb-container
-   docker rmi -f csc480-mongodb
-```
 
 Then follow the [Installation](#installation).
 
@@ -177,13 +98,6 @@ cd ./backend/<microservice>
 **Unit tests** are named `*Test.java`.  
 **Integration tests** are named `*IT.java`.
 
----
-## Backend
-
-Check out the OpenAPI UI to explore and test the backend endpoints:
-http://localhost:9080/openapi/ui/
-http://localhost:9081/openapi/ui/
-http://localhost:9082/openapi/ui/
 
 ---
 
@@ -211,21 +125,27 @@ When opening a pull request, include a concise description of the feature or fix
 
    > The branch name can be found on the GitHub PR page.
 
-3. Run `make setup` as needed if dependencies have changed.
+3. Run `make clean && make setup` as needed if dependencies have changed.
 
 ---
 
 ## Troubleshooting Tips
    > Feel free to update this if you have troubleshooting tips
 
-1. **Port 9080(or)3000 already in use / updates are not reflected**
+1. **Port 9080 (or) 3000 already in use / updates are not reflected**
    
    A previous Liberty process may still be running in the background. Kill it:
 ```bash
+   # For linux/mac
    kill -9 $(lsof -t -i :9080)
    kill -9 $(lsof -t -i :9081)
    kill -9 $(lsof -t -i :9082)
    kill -9 $(lsof -t -i :3000)
+   # For windows
+   for /f "tokens=5" %a in ('netstat -ano ^| findstr :9080') do taskkill /F /PID %a
+   for /f "tokens=5" %a in ('netstat -ano ^| findstr :9081') do taskkill /F /PID %a
+   for /f "tokens=5" %a in ('netstat -ano ^| findstr :9082') do taskkill /F /PID %a
+   for /f "tokens=5" %a in ('netstat -ano ^| findstr :3000') do taskkill /F /PID %a
 ```
 
 
