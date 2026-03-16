@@ -1,4 +1,4 @@
-.PHONY: dev dev-frontend dev-backend dev-mongodb setup setup-frontend setup-backend setup-mongodb stop-mongodb checkout-latest checkout clean clean-frontend clean-backend clean-mongodb
+.PHONY: dev dev-frontend dev-backend dev-mongodb setup setup-env setup-frontend setup-backend setup-mongodb stop-mongodb checkout-latest checkout clean clean-frontend clean-backend clean-mongodb
 
 start-backend: 
 	make -j start-backend-worklog start-backend-notification start-backend-task
@@ -58,7 +58,10 @@ check-deps:
 	@docker info >/dev/null 2>&1 || { echo "Error: Docker is not running. Please start Docker Desktop or install docker."; exit 1; }
 	@echo "All dependencies found."
 
-setup: check-deps setup-mongodb setup-frontend setup-backend
+setup: setup-env check-deps setup-mongodb setup-frontend setup-backend
+
+setup-env:
+	cd ./utils && node setup-env.js
 
 setup-frontend:
 	cd ./frontend && npm install
