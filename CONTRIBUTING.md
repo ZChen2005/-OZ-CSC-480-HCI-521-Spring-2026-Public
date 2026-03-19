@@ -10,6 +10,8 @@ Make sure you have the following installed before getting started:
 - [Docker](https://www.docker.com/products/docker-desktop)
 - Maven (or use the included `mvnw` wrapper — no install needed)
 
+> Windows Command Prompt and PowerShell use different commands that this project does not support. See [Windows](#windows) for instructions.
+
 ## Cloning the project
 
 Clone the repository and navigate into it:
@@ -148,6 +150,29 @@ When opening a pull request, include a concise description of the feature or fix
    for /f "tokens=5" %a in ('netstat -ano ^| findstr :3000') do taskkill /F /PID %a
 ```
 
+## Windows
+
+`make` is not available by default on Windows. Choose one of the following options to enable it:
+
+
+**Option 1: Use Git Bash**
+
+Git for Windows ships with `make`. Open **Git Bash** and run `make` commands from there instead of Command Prompt or PowerShell.
+
+**Option 2: Install via Chocolatey**
+
+```powershell
+choco install make
+```
+**Option 3: Use WSL (Windows Subsystem for Linux)**
+
+```powershell
+wsl --install
+```
+
+Then open a WSL terminal and follow the Mac/Linux instructions.
+
+You can now setup the project [Cloning the project](#cloning-the-project)
 
 ## Notes for Developers
 
