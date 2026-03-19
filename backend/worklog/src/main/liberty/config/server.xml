@@ -12,9 +12,6 @@
         <feature>passwordUtilities-1.1</feature>
         <!-- end::passwordUtilFeature[] -->
         <feature>restfulWS</feature>
-        <!-- tag::sslFeature[] -->
-        <feature>ssl-1.0</feature>
-        <!-- end::sslFeature[] -->
         <!-- tag::mpConfigFeature[] -->
         <feature>mpConfig</feature>
         <!-- end::mpConfigFeature[] -->
