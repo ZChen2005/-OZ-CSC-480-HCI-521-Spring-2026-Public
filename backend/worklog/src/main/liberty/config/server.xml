@@ -19,6 +19,8 @@
         <feature>mpConfig</feature>
         <!-- end::mpConfigFeature[] -->
         <feature>mpOpenAPI</feature>
+        <!-- to verify JWT -->
+        <feature>mpJwt</feature>
 
 
     </featureManager>
