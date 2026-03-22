@@ -28,6 +28,7 @@ public class AuthService {
 
             Document user = repo.findByEmail(email);
             if(user!=null){
+      
                 return user;
             }
             if(requestedRole==null || requestedRole.trim().isEmpty()){

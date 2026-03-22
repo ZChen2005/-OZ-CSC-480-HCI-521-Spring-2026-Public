@@ -14,7 +14,6 @@ import com.ibm.websphere.security.jwt.Claims;
 import com.ibm.websphere.security.jwt.JwtBuilder;
 
 import auth.service.AuthService;
-
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Inject;
 
@@ -47,6 +46,7 @@ public class AuthResource{
         try{
             String tokenIdFrontend = body.get("token_id");
             String rolerequested = body.get("role");
+           
 
             if(tokenIdFrontend==null || tokenIdFrontend.isEmpty()){
                 return Response.status(Response.Status.BAD_REQUEST)
@@ -55,14 +55,17 @@ public class AuthResource{
             }
             // verify google tokem
             Document user = authservice.verifyAndGetUser(tokenIdFrontend, rolerequested);
+            String id = user.getObjectId("_id").toHexString();
+
             String email = user.getString("email");
-            String name = user.getString("name");
+            String name = user.getString("name") != null ? user.getString("name") : email;
             String role = user.getString("role");
 
 
             // build JWT
             String token = JwtBuilder.create("jwtAuthBuilder")
             .claim(Claims.SUBJECT, email)
+            .claim("id", id)
             .claim("email", email)
             .claim("name", name)
             .claim("role", role)
@@ -76,10 +79,14 @@ public class AuthResource{
             response.put("email", email);
             response.put("name", name);
             response.put("role", role);
+            // System.out.println(response);
             return Response.ok(response).build();
 
         
         }catch(Exception e){
+            // System.out.println("error");
+            e.printStackTrace();
+ 
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
             .entity(e.getMessage())
             .build();

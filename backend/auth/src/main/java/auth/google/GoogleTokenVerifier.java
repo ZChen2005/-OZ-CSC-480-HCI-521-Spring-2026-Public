@@ -25,6 +25,7 @@ public class GoogleTokenVerifier {
                 GsonFactory.getDefaultInstance()
             ).setAudience(Collections.singletonList(googleClientId)).build();
         } catch(Exception e){
+            
             throw new RuntimeException("failed to initialize Google token verifier");
         }
     }

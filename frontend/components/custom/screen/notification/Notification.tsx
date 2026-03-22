@@ -13,6 +13,8 @@ export const Notification = () => {
     enabled: !!sessionId,
     queryFn: () => getWorkLog(sessionId),
   });
+  console.log(sessionId);
+  console.log(data);
 
   if (isLoading) return <p className="p-10">Loading notifications...</p>;
 

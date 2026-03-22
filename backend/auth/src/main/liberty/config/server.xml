@@ -25,6 +25,7 @@
         <!-- to validate jwt i dont think if we need here but does not harm to have it  -->
         <feature>mpJwt</feature>
         <feature>appSecurity</feature>
+
     </featureManager>
     <!-- end::featureManager[] -->
 
@@ -77,5 +78,6 @@
         keyStoreRef="defaultKeyStore" 
         trustDefaultCerts="true"
     />
+
     <!-- end::sslContext[] -->
 </server>

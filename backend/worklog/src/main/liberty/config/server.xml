@@ -20,7 +20,7 @@
         <!-- end::mpConfigFeature[] -->
         <feature>mpOpenAPI</feature>
         <!-- to verify JWT -->
-        <feature>mpJwt</feature>
+        <!-- <feature>mpJwt</feature> -->
 
 
     </featureManager>

@@ -70,6 +70,7 @@ export function WorkLogForm() {
   const mutation = useMutation({
     mutationFn: submitWorkLog,
     onSuccess: () => {
+      console.log("hello");
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
       form.reset({ tasks: [emptyTask] });
@@ -82,6 +83,7 @@ export function WorkLogForm() {
   });
 
   function onSubmit(data: taskType) {
+    console.log(data);
     const obj: workLogPostType = {
       authorName: sessionId,
       dateCreated: dateCreated,

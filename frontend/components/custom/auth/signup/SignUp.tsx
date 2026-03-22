@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import axios from "axios";
+import { resourceLimits } from "worker_threads";
 
 declare global {
   interface Window {
@@ -37,8 +39,17 @@ export default function SignUp() {
     mutationFn: (credential: string) => googleSignIn(credential, role),
     onSuccess: (data) => {
       setToken(data.token);
-      setUser(data.user);
-      router.push("/dashboard");
+      document.cookie = `token=${data.token}; path=/;`;
+      setUser({
+        email: data.email,
+        role: data.role,
+        name: data.name,
+        id: data.id,
+      });
+      // router.push("/dashboard");
+    },
+    onError: (error) => {
+      console.error(error);
     },
   });
 
@@ -51,9 +62,16 @@ export default function SignUp() {
 
     window.google.accounts.id.initialize({
       client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-      callback: (response: { credential: string }) => {
-        console.log("logged in");
+      callback: async (response: { credential: string }) => {
         mutate(response.credential);
+        // const res = await axios.post(
+        //   "http://localhost:9084/auth/api/auth/login",
+        //   {
+        //     token_id: response.credential,
+        //     role,
+        //   },
+        // );
+        // console.log(res.data);
       },
     });
 

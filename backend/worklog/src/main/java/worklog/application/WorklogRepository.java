@@ -101,6 +101,7 @@ public class WorklogRepository {
         Optional.ofNullable(entry.getTaskList())
             .ifPresent(v -> newDoc.put("taskList", formatTask(v)));
 
+
         newDoc.put("isDraft", true);
 
         collection.findOneAndReplace(Filters.and(
@@ -180,6 +181,10 @@ public class WorklogRepository {
 
             Optional.ofNullable(task.getCollaborators())
                 .ifPresent(v -> newDoc.put("collaborators", v));
+            
+            Optional.ofNullable(task.getStatus())
+                .ifPresent(v -> newDoc.put("status", v));
+
 
             taskDocs.add(newDoc);
         }

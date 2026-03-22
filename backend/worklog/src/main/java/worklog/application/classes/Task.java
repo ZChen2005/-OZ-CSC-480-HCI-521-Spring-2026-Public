@@ -14,6 +14,7 @@ public class Task {
     private LocalDate dueDate;
 
     private LocalDate creationDate;
+    private String status;
 
     private ArrayList<String> collaborators;
 
@@ -99,7 +100,7 @@ public class Task {
 
 
 
-    private String status;
+    
 
     
 

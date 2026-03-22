@@ -35,6 +35,7 @@ export const NotifCenter = () => {
   }
 
   const worklogs = data;
+  console.log(worklogs);
 
   const incompleteTasks = worklogs?.flatMap((log: any) =>
     (log.taskList ?? [])
@@ -48,6 +49,7 @@ export const NotifCenter = () => {
       })),
   );
 
+  // console.log(incompleteTasks);
   return (
     <div className="p-10  mr-20">
       <h1 className="text-4xl  mb-8">Notification Center</h1>
