@@ -39,6 +39,7 @@ export default function SignUp() {
     mutationFn: (credential: string) => googleSignIn(credential, role),
     onSuccess: (data) => {
       setToken(data.token);
+      // setting in cookie as well as setting token in localstorage is redundant but wc will work on next sprint
       document.cookie = `token=${data.token}; path=/;`;
       setUser({
         email: data.email,
@@ -46,7 +47,7 @@ export default function SignUp() {
         name: data.name,
         id: data.id,
       });
-      // router.push("/dashboard");
+      router.push("/");
     },
     onError: (error) => {
       console.error(error);
@@ -64,14 +65,7 @@ export default function SignUp() {
       client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
       callback: async (response: { credential: string }) => {
         mutate(response.credential);
-        // const res = await axios.post(
-        //   "http://localhost:9084/auth/api/auth/login",
-        //   {
-        //     token_id: response.credential,
-        //     role,
-        //   },
-        // );
-        // console.log(res.data);
+
       },
     });
 
