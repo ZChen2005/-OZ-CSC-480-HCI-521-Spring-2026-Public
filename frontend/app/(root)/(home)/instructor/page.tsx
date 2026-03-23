@@ -272,7 +272,8 @@ function StudentRow({ student }: { student: StudentSummary }) {
 
 const InstructorDashboard = () => {
   const userInfo = useAtomValue(userAtom);
-  if (userInfo?.role != "instructor") {
+
+  if (userInfo && userInfo?.role != "instructor") {
     return <h1>Sorry you dont have access to this page!</h1>;
   }
   const [search, setSearch] = useState("");

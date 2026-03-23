@@ -59,7 +59,7 @@ export default function SignUp() {
   }, [scriptLoaded, mutate]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 via-green-700 via-40% to-green-800">
+    <div className="min-h-screen bg-linear-to-br from-green-600 via-green-800 via-60% to-green-600">
       <div className="min-h-screen flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-24 p-6 sm:p-10">
         {/* Branding */}
         <div className="text-center lg:text-left max-w-md space-y-6">

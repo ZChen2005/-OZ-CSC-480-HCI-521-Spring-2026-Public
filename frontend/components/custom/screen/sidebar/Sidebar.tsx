@@ -11,16 +11,22 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { usePathname, useRouter } from "next/navigation";
-import { useSetAtom } from "jotai";
-import { tokenAtom } from "@/components/custom/utils/context/state";
-
-const items = [
-  { title: "Home", url: "/", icon: Home },
-  { title: "Notifications", url: "/notifications", icon: BellIcon },
-  { title: "WorkLogs", url: "/worklogs", icon: Workflow },
-];
+import { useAtomValue, useSetAtom } from "jotai";
+import { tokenAtom, userAtom } from "@/components/custom/utils/context/state";
 
 export function AppSidebar() {
+  const userInfo = useAtomValue(userAtom);
+  const items = [{ title: "Home", url: "/", icon: Home }];
+  // if (userInfo && userInfo.role == "instructor") {
+  //   const items = [{ title: "Home", url: "/", icon: Home }];
+  // }
+  if (userInfo && userInfo.role == "student") {
+    const items = [
+      { title: "Home", url: "/", icon: Home },
+      { title: "Notifications", url: "/notifications", icon: BellIcon },
+      { title: "WorkLogs", url: "/worklogs", icon: Workflow },
+    ];
+  }
   const pathname = usePathname();
   const router = useRouter();
   const setToken = useSetAtom(tokenAtom);
