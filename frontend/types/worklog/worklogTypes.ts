@@ -17,6 +17,7 @@ export const taskSchema = z.object({
 });
 
 export const workLogPostSchema = z.object({
+  worklogName: z.string().optional(),
   authorName: z.string(),
   dateCreated: z.string(),
   dateSubmitted: z.string(),

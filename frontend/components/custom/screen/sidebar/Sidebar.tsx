@@ -1,14 +1,5 @@
 "use client";
-import {
-  Calendar,
-  Home,
-  Inbox,
-  Search,
-  Settings,
-  BellIcon,
-  Workflow,
-  ListTodo,
-} from "lucide-react";
+import { Home, BellIcon, Workflow, LogOutIcon } from "lucide-react";
 
 import {
   Sidebar,
@@ -19,47 +10,41 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useSetAtom } from "jotai";
+import { tokenAtom } from "@/components/custom/utils/context/state";
 
-// Menu items.
 const items = [
-  {
-    title: "Home",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "Notifications",
-    url: "/notifications",
-    icon: BellIcon,
-  },
-
-  {
-    title: "WorkLogs",
-    url: "/worklogs",
-    icon: Workflow,
-  },
-  {
-    title: "TaskTrackers",
-    url: "/tasktrackers",
-    icon: ListTodo,
-  },
+  { title: "Home", url: "/", icon: Home },
+  { title: "Notifications", url: "/notifications", icon: BellIcon },
+  { title: "WorkLogs", url: "/worklogs", icon: Workflow },
 ];
 
 export function AppSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const setToken = useSetAtom(tokenAtom);
+
+  const handleLogout = () => {
+    setToken(null);
+    localStorage.removeItem("csc_480_token");
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date(0).toUTCString() + ";path=/");
+    });
+    router.push("/signup");
+  };
 
   return (
     <Sidebar>
       <SidebarContent className="m-5 mt-15">
-        {/* group1 for header */}
         <SidebarGroup className="m-3 mt-10 text-xl">
           HCI 521/CSC480
         </SidebarGroup>
 
-        {/* group 2 for side bar */}
         <SidebarGroup>
-          <SidebarGroupContent></SidebarGroupContent>
+          <SidebarGroupContent />
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
@@ -75,6 +60,16 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+
+              <SidebarMenuItem className="mt-2">
+                <SidebarMenuButton
+                  className="hover:bg-gray-300 cursor-pointer"
+                  onClick={handleLogout}
+                >
+                  <LogOutIcon />
+                  <span className="text-lg">Logout</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

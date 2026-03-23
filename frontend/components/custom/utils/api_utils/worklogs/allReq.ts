@@ -36,3 +36,15 @@ export async function getWorkLog(authorName: string | undefined) {
     throw err;
   }
 }
+
+export async function getAllWorkLogs() {
+  try {
+    const res = await client.get(`http://localhost:9081/worklog/api`);
+    return res.data;
+  } catch (err: any) {
+    if (err.response?.status === 404) {
+      return [];
+    }
+    throw err;
+  }
+}

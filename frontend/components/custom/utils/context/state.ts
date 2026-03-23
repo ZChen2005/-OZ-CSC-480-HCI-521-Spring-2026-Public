@@ -13,4 +13,10 @@ export const userAtom = atom((get) => {
     name: payload.name as string,
   };
 });
+export const worklogEditAtom = atom<{
+  mode: "new" | "resubmit";
+  weekNumber: string;
+  tasks?: any[];
+  previousSubmissions?: any[];
+} | null>(null);
 export const tokenAtom = atomWithStorage<string | null>("csc_480_token", null);

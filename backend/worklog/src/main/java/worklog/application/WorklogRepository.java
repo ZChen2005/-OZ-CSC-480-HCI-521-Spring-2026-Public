@@ -75,6 +75,7 @@ public class WorklogRepository {
         newDoc.put("dateCreated", entry.getDateCreated().format(dateTimeFormatter));
         newDoc.put("dateSubmitted", entry.getDateSubmitted().format(dateTimeFormatter));
         newDoc.put("collaborators", entry.getCollaborators());
+        newDoc.put("worklogName", entry.getWorklogName());
         newDoc.put("taskList", formatTask(entry.getTaskList()));
 
         collection.insertOne(newDoc);
@@ -97,6 +98,9 @@ public class WorklogRepository {
 
         Optional.ofNullable(entry.getCollaborators())
             .ifPresent(v -> newDoc.put("collaborators", v));
+
+        Optional.ofNullable(entry.getWorklogName())
+            .ifPresent(v -> newDoc.put("worklogName", v));
             
         Optional.ofNullable(entry.getTaskList())
             .ifPresent(v -> newDoc.put("taskList", formatTask(v)));

@@ -12,6 +12,8 @@ public class WorklogEntry {
 
     @NotEmpty(message = "Worklog must have an author!")
     private String authorName;
+    @NotEmpty(message = "Worklog must have week name!")
+    private String worklogName;
 
     @NotNull(message = "Date created required")
     private LocalDate dateCreated;
@@ -28,6 +30,13 @@ public class WorklogEntry {
 
     public void setAuthorName(String name) {
         this.authorName = name;
+    }
+
+    public String getWorklogName() {
+        return worklogName;
+    }
+        public void setWorklogName(String worklogName) {
+        this.worklogName = worklogName;
     }
 
     public String getAuthorName() {
