@@ -28,6 +28,8 @@ Clone the repository and navigate into it:
 
 ## Installation
 
+Check environment variables in `config/env-dev.json`
+
 Install dependencies and run the project:
 
 **Mac/Linux**
@@ -65,6 +67,22 @@ Backend documentation
 
 ---
 
+## Running Docker Compose Locally (Replication of Production Setup)
+
+Ensure `config/env-docker-compose.json` exists
+
+To run docker compose
+``` bash
+   make run-docker-compose
+```
+> Note: check `docker ps` for port numbers as this is different from development
+
+To stop docker compose
+``` bash
+   make stop-docker-compose
+```
+
+---
 ## Running Version Releases
 
 During weekly sprints, the full stack team will tag a release when ready.
