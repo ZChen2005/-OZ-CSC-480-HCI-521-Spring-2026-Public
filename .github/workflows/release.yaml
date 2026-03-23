@@ -36,7 +36,6 @@ jobs:
                   push: true
                   tags: |
                     ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}/frontend:${{ env.VERSION }}
-                    ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}/frontend:latest
 
     build_backend_worklog:
         name: build_backend_worklog
@@ -62,7 +61,6 @@ jobs:
                   push: true
                   tags: |
                     ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}/backend-worklog:${{ env.VERSION }}
-                    ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}/backend-worklog:latest
 
     build_backend_notification:
         name: build_backend_notification
@@ -88,7 +86,6 @@ jobs:
                   push: true
                   tags: |
                     ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}/backend-notification:${{ env.VERSION }}
-                    ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}/backend-notification:latest
 
     build_backend_task:
         name: build_backend_task
@@ -114,7 +111,6 @@ jobs:
                   push: true
                   tags: |
                     ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}/backend-task:${{ env.VERSION }}
-                    ${{ env.REGISTRY }}/${{ steps.image.outputs.name }}/backend-task:latest
 
     create_release:
         name: create_release
