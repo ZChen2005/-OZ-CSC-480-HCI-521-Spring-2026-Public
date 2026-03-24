@@ -5,7 +5,7 @@ export const userAtom = atom((get) => {
   const token = get(tokenAtom);
   if (!token) return null;
   const payload = JSON.parse(atob(token.split(".")[1]));
-  console.log(payload);
+
   return {
     id: payload.id as string,
     email: payload.email as string,

@@ -20,18 +20,17 @@ export async function submitWorkLog(data: workLogPostType) {
 }
 export async function getWorkLog(authorName: string | undefined) {
   try {
-    if (authorName) {
-      const res = await client.get(
-        // `${API_BASE}:${WORKLOG_PORT}/worklog/api/author/${authorName}`,
-        `http://localhost:9081/worklog/api/author/${authorName}`,
-      );
+    const res = await client.get(
+      // `${API_BASE}:${WORKLOG_PORT}/worklog/api/author/${authorName}`,
+      `http://localhost:9081/worklog/api/author/${authorName}`,
+    );
 
-      return res.data;
-    }
+    return res.data;
+
     return [];
   } catch (err: any) {
     if (err.response?.status === 404) {
-      return [];
+      return err;
     }
     throw err;
   }
@@ -43,7 +42,7 @@ export async function getAllWorkLogs() {
     return res.data;
   } catch (err: any) {
     if (err.response?.status === 404) {
-      return [];
+      return err;
     }
     throw err;
   }

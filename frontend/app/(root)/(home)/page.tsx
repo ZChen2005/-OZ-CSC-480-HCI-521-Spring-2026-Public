@@ -5,21 +5,24 @@ import { useRouter } from "next/navigation";
 // import { InstructorDashboard } from "@/components/custom/screen/home/InstructorDashboard";
 import { useAtomValue } from "jotai";
 import { userAtom } from "@/components/custom/utils/context/state";
+import { useEffect } from "react";
 const Page = () => {
   const userInfo = useAtomValue(userAtom);
   const router = useRouter();
-  if (userInfo && userInfo.role == "instructor") {
-    // Navigate
-    router.push("/instructor");
-  }
-  if (userInfo && userInfo.role == "student") {
-    return (
-      <div className="w-full h-full overflow-y-auto p-10">
-        <Welcome />
-        <NotifCenter />
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (userInfo?.role === "instructor") {
+      router.push("/instructor");
+    }
+  }, [userInfo, router]);
+
+  // if (userInfo && userInfo.role == "student") {
+  return (
+    <div className="w-full h-full overflow-y-auto p-10">
+      <Welcome />
+      <NotifCenter />
+    </div>
+  );
+  // }
 };
 
 export default Page;

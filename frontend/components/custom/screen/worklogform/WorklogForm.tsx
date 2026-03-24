@@ -195,7 +195,7 @@ export function WorkLogForm() {
 
   const { data: allWorklogs } = useQuery({
     queryKey: ["worklogs", userInfo?.id],
-    enabled: !!userInfo?.id,
+    // enabled: !!userInfo?.id,
     queryFn: () => getWorkLog(userInfo?.email),
   });
 

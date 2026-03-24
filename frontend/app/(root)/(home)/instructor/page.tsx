@@ -273,9 +273,7 @@ function StudentRow({ student }: { student: StudentSummary }) {
 const InstructorDashboard = () => {
   const userInfo = useAtomValue(userAtom);
 
-  if (userInfo && userInfo?.role != "instructor") {
-    return <h1>Sorry you dont have access to this page!</h1>;
-  }
+
   const [search, setSearch] = useState("");
   const worklogInfo = getWorklogDate(new Date("2026-01-26"));
   const currentWeek = worklogInfo ? parseInt(worklogInfo.weekNumber) : 0;
@@ -285,7 +283,14 @@ const InstructorDashboard = () => {
     queryFn: getAllWorkLogs,
   });
 
-  if (isLoading) return <p className="p-4 sm:p-10">Loading dashboard...</p>;
+  if (userInfo && userInfo?.role != "instructor") {
+    return (
+      <>
+        <h1>Sorry you dont have access to this page!</h1>;
+      </>
+    );
+  }
+  if (isLoading) return <p className="p-4 sm:p-10">Loading</p>;
 
   const allWorklogs = data ?? [];
   const students = buildStudentSummaries(allWorklogs, currentWeek);

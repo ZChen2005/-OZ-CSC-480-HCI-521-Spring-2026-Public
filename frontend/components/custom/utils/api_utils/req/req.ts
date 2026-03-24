@@ -2,7 +2,6 @@ import axios from "axios";
 import { createClient } from "./client";
 
 export async function googleSignIn(credential: string, role?: string) {
-  console.log(role);
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
   const AUTHPORT = process.env.NEXT_PUBLIC_AUTH_PORT;
   const client = createClient(BASE_URL || "http://localhost");
@@ -13,7 +12,6 @@ export async function googleSignIn(credential: string, role?: string) {
   const data = await res.data;
 
   // return data;
-  console.log(data);
 
   return data as {
     token: string;

@@ -16,12 +16,12 @@ import { tokenAtom, userAtom } from "@/components/custom/utils/context/state";
 
 export function AppSidebar() {
   const userInfo = useAtomValue(userAtom);
-  const items = [{ title: "Home", url: "/", icon: Home }];
+  var items = [{ title: "Home", url: "/", icon: Home }];
   // if (userInfo && userInfo.role == "instructor") {
   //   const items = [{ title: "Home", url: "/", icon: Home }];
   // }
   if (userInfo && userInfo.role == "student") {
-    const items = [
+    items = [
       { title: "Home", url: "/", icon: Home },
       { title: "Notifications", url: "/notifications", icon: BellIcon },
       { title: "WorkLogs", url: "/worklogs", icon: Workflow },

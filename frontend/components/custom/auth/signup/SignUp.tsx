@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
-import { useSetAtom } from "jotai";
+import { useAtomValue, useSetAtom } from "jotai";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { tokenAtom } from "@/components/custom/utils/context/state";
+import { tokenAtom, userAtom } from "@/components/custom/utils/context/state";
 import { googleSignIn } from "@/components/custom/utils/api_utils/req/req";
 import {
   Card,
@@ -26,6 +26,7 @@ export default function SignUp() {
   const buttonRef = useRef<HTMLDivElement>(null);
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const setToken = useSetAtom(tokenAtom);
+  const userInfo = useAtomValue(userAtom);
   const router = useRouter();
 
   const { mutate, isError } = useMutation({
@@ -33,6 +34,7 @@ export default function SignUp() {
     onSuccess: (data) => {
       setToken(data.token);
       document.cookie = `token=${data.token}; path=/;`;
+      if (userInfo?.role == "instructor") router.push("/instructor");
       router.push("/");
     },
   });
