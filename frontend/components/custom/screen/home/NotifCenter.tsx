@@ -22,7 +22,7 @@ export const NotifCenter = () => {
 
   const { data, isLoading } = useQuery({
     queryKey: ["worklogs", userInfo?.id],
-    // enabled: !!userInfo?.id,
+    enabled: !!userInfo?.id,
     queryFn: () => getWorkLog(userInfo?.email),
   });
 
