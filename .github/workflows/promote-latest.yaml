@@ -1,0 +1,38 @@
+name: Promote to Latest
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: "Version tag to promote latest (e.g. v1.2.3)"
+                required: true
+
+env:
+    REGISTRY: ghcr.io
+
+jobs:
+    promote:
+        runs-on: ubuntu-latest
+        permissions:
+            packages: write
+        steps:
+            - name: Log in to GHCR
+              uses: docker/login-action@v3
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+
+            - name: Set lowercase image name
+              id: image
+              run: echo "name=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]' | sed 's/\/-oz-/\/oz-/')" >> $GITHUB_OUTPUT
+
+            - name: Promote images to latest
+              run: |
+                  BASE=${{ env.REGISTRY }}/${{ steps.image.outputs.name }}
+                  VERSION=${{ inputs.version }}
+
+                  for service in frontend backend-worklog backend-notification backend-task; do
+                    docker pull $BASE/$service:$VERSION
+                    docker tag  $BASE/$service:$VERSION $BASE/$service:latest
+                    docker push $BASE/$service:latest
+                  done
