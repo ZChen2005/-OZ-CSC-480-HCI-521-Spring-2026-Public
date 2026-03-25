@@ -4,9 +4,10 @@ import {
 } from "@/types/worklog/worklogTypes";
 import { createClient } from "../req/client";
 import axios from "axios";
+import { env } from "next-runtime-env";
 
-const API_BASE = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost";
-const WORKLOG_PORT = process.env.NEXT_PUBLIC_WORKLOG_PORT;
+const API_BASE = env("NEXT_PUBLIC_BASE_URL") || "http://localhost";
+const WORKLOG_PORT = env("NEXT_PUBLIC_WORKLOG_PORT");
 
 const client = createClient(API_BASE);
 export async function submitWorkLog(data: workLogPostType) {

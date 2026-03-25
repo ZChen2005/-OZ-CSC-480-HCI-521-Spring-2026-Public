@@ -15,6 +15,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { GraduationCap, ClipboardList, BookOpen, Users } from "lucide-react";
+import { env } from "next-runtime-env";
 
 declare global {
   interface Window {
@@ -45,9 +46,20 @@ export default function SignUp() {
 
   useEffect(() => {
     if (!scriptLoaded || !window.google || !buttonRef.current) return;
-
+    console.log(
+      "GOOGLECLIENTID:",
+      env("NEXT_PUBLIC_GOOGLE_CLIENT_ID"),
+      "\nWORKLOGS_API_URL:",
+      env("NEXT_PUBLIC_WORKLOGS_API_URL"),
+      "\nBASE_URL:",
+      env("NEXT_PUBLIC_BASE_URL"),
+      "\nWORKLOG_PORT:",
+      env("NEXT_PUBLIC_WORKLOG_PORT"),
+      "\nAUTH_PORT:",
+      env("NEXT_PUBLIC_AUTH_PORT"),
+    );
     window.google.accounts.id.initialize({
-      client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+      client_id: env("NEXT_PUBLIC_GOOGLE_CLIENT_ID")!,
       callback: (response: { credential: string }) => {
         mutate(response.credential);
       },
