@@ -58,7 +58,7 @@ check-deps:
 	@docker info >/dev/null 2>&1 || { echo "Error: Docker is not running. Please start Docker Desktop or install docker."; exit 1; }
 	@echo "All dependencies found."
 
-setup: setup-env check-deps setup-mongodb setup-frontend setup-backend
+setup: check-deps setup-mongodb setup-frontend setup-backend
 
 setup-env:
 	node ./utils/setup-env-dev.js
@@ -102,7 +102,6 @@ clean-mongodb:
 	docker compose -f docker-compose.dev.yml down -v
 
 run-docker-compose:
-	make setup-docker-compose-env
 	docker compose -f docker-compose.yml up -d
 	docker ps
 
