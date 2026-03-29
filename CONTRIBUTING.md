@@ -29,8 +29,6 @@ Make sure you have the following installed before getting started:
 
 ## Installation
 
-Check environment variables in `config/env-dev.json`
-
 Install dependencies and run the project:
 
 **Mac/Linux**
@@ -39,6 +37,8 @@ Install dependencies and run the project:
    make clean # Remove existing system residue that might conflict with this project
    make setup # Setup environment variables and install required dependencies for frontend, backend and mongodb
 ```
+
+Refer to [Secrets](https://drive.google.com/drive/folders/18o940HLTQVe0yTq6HfDeKFZzcWMFWRJ9?usp=sharing) folder for credentials
 
 Then start the project:
 
