@@ -6,7 +6,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.openliberty.guides</groupId>
-    <artifactId>notifier</artifactId>
+    <artifactId>notification</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
 
@@ -15,10 +15,10 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <liberty.var.http.port>${env.HTTP_PORT}</liberty.var.http.port>
-        <liberty.var.https.port>${env.HTTPS_PORT}</liberty.var.https.port>
+        <liberty.var.http.port>9080</liberty.var.http.port>
+        <liberty.var.https.port>9443</liberty.var.https.port>
         <app.name>${project.artifactId}</app.name>
-        <liberty.var.app.context.root>/notifier</liberty.var.app.context.root>
+        <liberty.var.app.context.root>/notification</liberty.var.app.context.root>
         <package.file>${project.build.directory}/${app.name}.zip</package.file>
     </properties>
 
