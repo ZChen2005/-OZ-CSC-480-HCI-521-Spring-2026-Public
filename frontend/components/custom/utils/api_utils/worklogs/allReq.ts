@@ -39,7 +39,7 @@ export async function getWorkLog(authorName: string | undefined) {
 
 export async function getAllWorkLogs() {
   try {
-    const res = await client.get(`http://localhost:9081/worklog/api`);
+    const res = await client.get(`${API_BASE}:${WORKLOG_PORT}/worklog/api`);
     return res.data;
   } catch (err: any) {
     if (err.response?.status === 404) {
