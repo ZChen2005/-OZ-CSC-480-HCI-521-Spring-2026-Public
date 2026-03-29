@@ -37,4 +37,7 @@
     <variable name="mongo.dbname" defaultValue="appdb" />
     <variable name="mongo.username" defaultValue="appuser" />
     <variable name="mongo.password" defaultValue="secret123" />
+    <variable name="http.port" defaultValue="9081" />
+    <variable name="https.port" defaultValue="9441" />
+    <variable name="app.context.root" defaultValue="/worklog/" />
 </server>
