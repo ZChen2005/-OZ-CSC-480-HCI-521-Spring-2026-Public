@@ -134,7 +134,7 @@
                 <version>3.11.5</version>
                 <configuration>
                     <serverName>authManager</serverName>
-                    <libertyDebugPort>7771</libertyDebugPort>
+                    <libertyDebugPort>7773</libertyDebugPort>
                 </configuration>
                 <executions>
                     <execution>
