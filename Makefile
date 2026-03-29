@@ -1,7 +1,7 @@
 .PHONY: dev dev-frontend dev-backend dev-mongodb setup setup-env setup-frontend setup-backend setup-mongodb stop-mongodb checkout-latest checkout clean clean-frontend clean-backend clean-mongodb setup-docker-compose-env
 
-start-backend: 
-	make -j start-backend-worklog start-backend-notification start-backend-task
+start-backend:
+	make -j start-backend-worklog start-backend-notification start-backend-task start-backend-auth
 
 start-backend-worklog:
 	cd ./backend/worklog && ./mvnw liberty:start
@@ -12,10 +12,14 @@ start-backend-notification:
 start-backend-task:
 	cd ./backend/task && ./mvnw liberty:start
 
+start-backend-auth:
+	cd ./backend/auth && ./mvnw liberty:start
+
 stop-backend:
 	cd backend/worklog && ./mvnw liberty:stop || true
 	cd backend/notification && ./mvnw liberty:stop || true
 	cd backend/task && ./mvnw liberty:stop || true
+	cd backend/auth && ./mvnw liberty:stop || true
 
 dev:
 	make dev-mongodb
@@ -25,7 +29,7 @@ dev-frontend:
 	cd ./frontend && npm run dev
 
 dev-backend: stop-backend
-	make -j dev-backend-worklog dev-backend-notification dev-backend-task
+	make -j dev-backend-worklog dev-backend-notification dev-backend-task dev-backend-auth
 
 dev-backend-worklog:
 	cd ./backend/worklog && ./mvnw liberty:dev
@@ -36,15 +40,20 @@ dev-backend-notification:
 dev-backend-task:
 	cd ./backend/task && ./mvnw liberty:dev
 
+dev-backend-auth:
+	cd ./backend/auth && ./mvnw liberty:dev
+
 dev-backend-clean:
 	cd ./backend/worklog && ./mvnw clean
 	cd ./backend/notification && ./mvnw clean
 	cd ./backend/task && ./mvnw clean
+	cd ./backend/auth && ./mvnw clean
 
 dev-backend-stop:
 	cd ./backend/worklog && ./mvnw liberty:stop
 	cd ./backend/notification && ./mvnw liberty:stop
 	cd ./backend/task && ./mvnw liberty:stop
+	cd ./backend/auth && ./mvnw liberty:stop
 
 check-deps:
 	@command -v docker >/dev/null 2>&1 || { echo "Error: Docker not found. Install from https://www.docker.com/products/docker-desktop"; exit 1; }
@@ -80,6 +89,7 @@ setup-backend:
 	cd ./backend/worklog && ./mvnw clean install
 	cd ./backend/notification && ./mvnw clean install
 	cd ./backend/task && ./mvnw clean install
+	cd ./backend/auth && ./mvnw clean install
 
 setup-mongodb dev-mongodb:
 	docker compose -f docker-compose.dev.yml up -d
@@ -96,6 +106,7 @@ clean-backend:
 	cd backend/task && ./mvnw clean
 	cd backend/worklog && ./mvnw clean
 	cd backend/notification && ./mvnw clean
+	cd backend/auth && ./mvnw clean
 
 clean-mongodb:
 	docker rm -f csc480-mongodb-container || true
