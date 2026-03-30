@@ -12,15 +12,22 @@
         <feature>passwordUtilities-1.1</feature>
         <!-- end::passwordUtilFeature[] -->
         <feature>restfulWS</feature>
+        <!-- tag::sslFeature[] -->
+        <feature>ssl-1.0</feature>
+        <!-- end::sslFeature[] -->
         <!-- tag::mpConfigFeature[] -->
         <feature>mpConfig</feature>
         <!-- end::mpConfigFeature[] -->
         <feature>mpOpenAPI</feature>
+        <!-- to verify JWT -->
+        <feature>mpJwt</feature>
 
 
     </featureManager>
     <!-- end::featureManager[] -->
-
+    <variable name="http.port" defaultValue="9081" />
+    <variable name="https.port" defaultValue="9441" />
+    <variable name="app.context.root" defaultValue="/worklog/" />
     <!-- tag::httpEndpoint[] -->
     <httpEndpoint
         host="*"
@@ -33,14 +40,20 @@
     <!-- tag::webApplication[] -->
     <webApplication
         location="worklog.war"
-        contextRoot="${app.context.root}"
-    />
+        contextRoot="${app.context.root}">
+        <application-bnd>
+            <security-role name="student">
+                <special-subject type="ALL_AUTHENTICATED_USERS" />
+            </security-role>
+            <security-role name="instructor">
+                <special-subject type="ALL_AUTHENTICATED_USERS" />
+            </security-role>
+        </application-bnd>
+    </webApplication>
     <!-- end::webApplication[] -->
+    <mpJwt id="defaultMpJwt"
+        userNameAttribute="email"
+        mapToUserRegistry="false"
+    />
 
-    <variable name="mongo.hostname" defaultValue="localhost" />
-    <variable name="mongo.port" defaultValue="27017" />
-    <variable name="mongo.dbname" defaultValue="appdb" />
-    <variable name="mongo.username" defaultValue="appuser" />
-    <variable name="mongo.password" defaultValue="secret123" />
-    <variable name="app.context.root" defaultValue="/worklog"/>
 </server>

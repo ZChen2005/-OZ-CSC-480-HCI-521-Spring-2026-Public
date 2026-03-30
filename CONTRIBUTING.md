@@ -29,8 +29,6 @@ Make sure you have the following installed before getting started:
 
 ## Installation
 
-Check environment variables in `config/env-dev.json`
-
 Install dependencies and run the project:
 
 **Mac/Linux**
@@ -39,6 +37,10 @@ Install dependencies and run the project:
    make clean # Remove existing system residue that might conflict with this project
    make setup # Setup environment variables and install required dependencies for frontend, backend and mongodb
 ```
+
+ > IMPORTANT NOTE: If you have run this project before, please remove server.env files from each backend microservices.
+
+Refer to [Secrets](https://drive.google.com/drive/folders/18o940HLTQVe0yTq6HfDeKFZzcWMFWRJ9?usp=sharing) folder for credentials
 
 Then start the project:
 
@@ -60,20 +62,25 @@ Backend
 - notification backend [http://localhost:9080](http://localhost:9080)
 - worklog backend - [http://localhost:9081](http://localhost:9081)
 - task backend - [http://localhost:9082](http://localhost:9082)
+- auth backend - [http://localhost:9084](http://localhost:9084) / [https://localhost:9445](https://localhost:9445)
 
-Backend documentation 
+Backend documentation
 - notification backend doc - [http://localhost:9080/openapi/ui](http://localhost:9080/openapi/ui)
 - worklog backend doc - [http://localhost:9081/openapi/ui](http://localhost:9081/openapi/ui)
 - task backend doc - [http://localhost:9082/openapi/ui](http://localhost:9082/openapi/ui)
+- auth backend doc - [http://localhost:9084/openapi/ui](http://localhost:9084/openapi/ui)
 
 ---
 
 ## Running Docker Compose Locally (Replication of Production Setup)
 
-Ensure `config/env-docker-compose.json` exists
+WIP
+
+Requires adding environment files in .secrets/
 
 To run docker compose
 ``` bash
+   make stop-mongodb # To stop locally running mongodb 
    make run-docker-compose
 ```
 > Note: check `docker ps` for port numbers as this is different from development
@@ -154,18 +161,20 @@ When opening a pull request, include a concise description of the feature or fix
    > Feel free to update this if you have troubleshooting tips
 
 1. **Port 9080 (or) 3000 already in use / updates are not reflected**
-   
+
    A previous Liberty process may still be running in the background. Kill it:
 ```bash
    # For linux/mac
    kill -9 $(lsof -t -i :9080)
    kill -9 $(lsof -t -i :9081)
    kill -9 $(lsof -t -i :9082)
+   kill -9 $(lsof -t -i :9084)
    kill -9 $(lsof -t -i :3000)
    # For windows
    for /f "tokens=5" %a in ('netstat -ano ^| findstr :9080') do taskkill /F /PID %a
    for /f "tokens=5" %a in ('netstat -ano ^| findstr :9081') do taskkill /F /PID %a
    for /f "tokens=5" %a in ('netstat -ano ^| findstr :9082') do taskkill /F /PID %a
+   for /f "tokens=5" %a in ('netstat -ano ^| findstr :9084') do taskkill /F /PID %a
    for /f "tokens=5" %a in ('netstat -ano ^| findstr :3000') do taskkill /F /PID %a
 ```
 

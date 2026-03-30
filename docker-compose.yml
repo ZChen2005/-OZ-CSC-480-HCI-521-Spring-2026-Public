@@ -14,12 +14,18 @@ services:
   backend-worklog:
     build:
       context: ./backend/worklog
-    volumes:
-      - ./.secrets/backend-worklog.env:/config/server.env:ro
     ports:
-      - "7002:9081"
-    env_file:
-      - ./.secrets/backend-worklog.env
+      - "7001:9081"
+    restart: unless-stopped
+    depends_on:
+      mongodb:
+        condition: service_healthy
+  
+  backend-auth:
+    build:
+      context: ./backend/auth
+    ports:
+      - "7002:9084"
     restart: unless-stopped
     depends_on:
       mongodb:

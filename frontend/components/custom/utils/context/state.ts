@@ -1,14 +1,22 @@
 import { atom } from "jotai";
+import { atomWithStorage } from "jotai/utils";
 
-const getSessionId = (): string => {
-  if (typeof window === "undefined") return "";
-  const key = "csc_480_session_id";
-  let id = localStorage.getItem(key);
-  if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem(key, id);
-  }
-  return id;
-};
+export const userAtom = atom((get) => {
+  const token = get(tokenAtom);
+  if (!token) return null;
+  const payload = JSON.parse(atob(token.split(".")[1]));
 
-export const sessionIdAtom = atom<string>(getSessionId());
+  return {
+    id: payload.id as string,
+    email: payload.email as string,
+    role: payload.role as string,
+    name: payload.name as string,
+  };
+});
+export const worklogEditAtom = atom<{
+  mode: "new" | "resubmit";
+  weekNumber: string;
+  tasks?: any[];
+  previousSubmissions?: any[];
+} | null>(null);
+export const tokenAtom = atomWithStorage<string | null>("csc_480_token", null);

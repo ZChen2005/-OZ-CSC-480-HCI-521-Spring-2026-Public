@@ -1,0 +1,83 @@
+<server description="auth">
+    <!-- tag::featureManager[] -->
+    <featureManager>
+        <platform>jakartaee-10.0</platform>
+        <platform>microprofile-7.1</platform>
+        <feature>beanValidation</feature>
+        <!-- tag::cdiFeature[] -->
+        <feature>cdi</feature>
+        <!-- end::cdiFeature[] -->
+        <feature>jsonb</feature>
+        <!-- tag::passwordUtilFeature[] -->
+        <feature>passwordUtilities-1.1</feature>
+        <!-- end::passwordUtilFeature[] -->
+        <feature>restfulWS</feature>
+        <!-- tag::sslFeature[] -->
+        <feature>ssl-1.0</feature>
+        <!-- end::sslFeature[] -->
+        <!-- tag::mpConfigFeature[] -->
+        <feature>mpConfig</feature>
+        <!-- end::mpConfigFeature[] -->
+        <feature>mpOpenAPI</feature>
+        <!-- for google oauth -->
+        <!-- to create JWT -->
+        <feature>jwt-1.0</feature>
+        <!-- to validate jwt i dont think if we need here but does not harm to have it  -->
+        <feature>mpJwt</feature>
+        <feature>appSecurity</feature>
+
+    </featureManager>
+    <!-- end::featureManager[] -->
+
+    <variable name="app.context.root" defaultValue="auth/"/>
+
+    <!-- tag::httpEndpoint[] -->
+    <httpEndpoint
+        host="*" 
+        httpPort="${http.port}" 
+        httpsPort="${https.port}" 
+        id="defaultHttpEndpoint"
+    />
+    <!-- end::httpEndpoint[] -->
+
+    <!-- tag::webApplication[] -->
+    <webApplication 
+        location="auth.war"
+        contextRoot="${app.context.root}">
+        <application-bnd>
+        <security-role name='users'>
+        <special-subject type="ALL_AUTHENTICATED_USERS"/>
+        </security-role>
+        </application-bnd>
+    </webApplication>
+    <!-- end::webApplication[] -->
+    <!-- tag::sslContext[] -->
+    <!-- tag::keyStore[] -->
+
+    <!-- end::keyStore[] -->
+    <!-- tag::ssl[] -->
+
+    <!-- <variable name="mongo.hostname" value="localhost" />
+    <variable name="mongo.port" value="27017" />
+    <variable name="mongo.dbname" value="appdb" />
+    <variable name="mongo.username" value="appuser" />
+    <variable name="mongo.password" value="secret123" /> -->
+
+    <!-- end::ssl[] -->
+    <!-- for google oauth  -->
+    <!-- havent included secrets -->
+\ <!-- for jwt -->
+    <jwtBuilder id="jwtAuthBuilder" keyAlias="default" issuer="LakerTracks" expiry="2h" audiences="worklog" signatureAlgorithm="RS256"/>  
+    <!-- keystore to sign JWT -->
+    <keyStore id="defaultKeyStore" password="google" location="${server.config.dir}/resources/security/key.p12" type="PKCS12"/>
+    <!-- SSL FOR GOOGLE -->
+
+    
+    <ssl 
+        id="defaultSSLConfig" 
+        keyStoreRef="defaultKeyStore" 
+        trustDefaultCerts="true"
+    />
+
+    <!-- end::sslContext[] -->
+</server>

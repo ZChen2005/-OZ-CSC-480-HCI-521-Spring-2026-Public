@@ -11,6 +11,12 @@
         <feature>mpOpenAPI</feature>
     </featureManager>
 
+    <variable name="mongo.hostname" defaultValue="localhost" />
+    <variable name="mongo.port" defaultValue="27017" />
+    <variable name="mongo.dbname" defaultValue="appdb" />
+    <variable name="mongo.username" defaultValue="appuser" />
+    <variable name="mongo.password" defaultValue="secret123" />
+
     <!-- cors allowed -->
     <cors domain="*"
         allowedOrigins="*"
@@ -29,17 +35,9 @@
 
     <!-- tag::webApplication[] -->
     <webApplication
-        location="notifier.war"
+        location="notification.war"
         contextRoot="${app.context.root}"
     />
     <!-- end::webApplication[] -->
-
-
-    <variable name="mongo.hostname" defaultValue="localhost" />
-    <variable name="mongo.port" defaultValue="27017" />
-    <variable name="mongo.dbname" defaultValue="appdb" />
-    <variable name="mongo.username" defaultValue="appuser" />
-    <variable name="mongo.password" defaultValue="secret123" />
-
 
 </server>
