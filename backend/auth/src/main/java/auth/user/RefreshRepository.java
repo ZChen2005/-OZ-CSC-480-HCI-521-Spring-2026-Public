@@ -3,6 +3,7 @@ package auth.user;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import java.time.Instant;
@@ -10,6 +11,7 @@ import java.util.UUID;
 
 import org.bson.Document;
 
+@ApplicationScoped
 public class RefreshRepository {
     private MongoCollection<Document> collection;
 
