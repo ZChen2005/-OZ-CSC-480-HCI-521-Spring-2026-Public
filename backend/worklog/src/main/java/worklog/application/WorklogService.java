@@ -1,6 +1,8 @@
 package worklog.application;
 
 import java.time.LocalDate;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.parameters.Parameter;
@@ -26,20 +28,32 @@ import jakarta.annotation.security.RolesAllowed;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @ApplicationScoped
-@RolesAllowed({"student", "instructor"})
+//@RolesAllowed({"student", "instructor"})
 public class WorklogService {
     @Inject
     Validator validator;
 
     @Inject
     private WorklogRepository repo;
-    
+
+    @Inject
+    private Logger logger;
+
+    @GET
+    @Path("/logs")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Operation(summary = "Testing for logging")
+    public String testLogs() {
+        logger.log(Level.INFO, "LOG TEST LOG");
+        return "Log test";
+    }
 
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Gets all worklogs in the db")
     public Response getAllWorklogs() {
+        logger.log(Level.INFO, "GET: getAllWorklogs()");
         return repo.getAll();
     }
 
@@ -48,6 +62,7 @@ public class WorklogService {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Gets all drafts in the db")
     public Response getCurrentDraft() {
+        logger.log(Level.INFO, "GET: getCurrentDraft()");
         return repo.getDraft();
     }
 
@@ -56,7 +71,8 @@ public class WorklogService {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Get worklog by author name in the database.")
     public Response getWorklogByAuthorName(@jakarta.ws.rs.PathParam("authorName") String authorName) {
-       return  repo.findByAuthor(authorName);
+        logger.log(Level.INFO, "GET: getWorklogByAuthorName()");
+        return repo.findByAuthor(authorName);
     }
 
     @POST
@@ -71,6 +87,7 @@ public class WorklogService {
             entry.setDateCreated(LocalDate.now());
         }
 
+        logger.log(Level.INFO, "POST: createWorklog()");
         return repo.addWorklog(entry);
 
     }
@@ -82,6 +99,7 @@ public class WorklogService {
     @Produces(MediaType.APPLICATION_JSON)
     @Operation(summary = "Update worklog draft by mongo ID in the database.")
     public Response updateWorklog(@jakarta.ws.rs.PathParam("id") String id, @Valid WorklogEntry updatedEntry) {
+        logger.log(Level.INFO, "PUT: updateWorklog()");
         return repo.updateWorklog(id, updatedEntry);
     }
 
@@ -96,7 +114,7 @@ public class WorklogService {
     public Response update(WorklogEntry worklog,
         @Parameter(description = "studentID of owner.",required = true) 
         @PathParam("userId") String userId) {
-
+        logger.log(Level.INFO, "PUT: update()");
         return repo.addWorklogDraft(worklog, userId);
     }
 
@@ -105,7 +123,7 @@ public class WorklogService {
     @Path("/delAll")
     @Operation(summary = "WARNING DELETES *EVERY* WORKLOG")
     public Response deleteAll() {
-
+        logger.log(Level.INFO, "DELETE: deleteAll()");
         return repo.deleteAll();
     }
 
@@ -113,6 +131,7 @@ public class WorklogService {
     @Path("/id/{id}")
     @Operation(summary = "Deletes by mongo ID")
     public Response deleteWorklog(@jakarta.ws.rs.PathParam("id") String id) {
+        logger.log(Level.INFO, "DELETE: deleteWorklog()");
         return repo.deleteWorklog(id);
     }
 
