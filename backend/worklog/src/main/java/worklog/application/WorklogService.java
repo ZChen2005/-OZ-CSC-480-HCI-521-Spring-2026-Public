@@ -28,7 +28,7 @@ import jakarta.annotation.security.RolesAllowed;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @ApplicationScoped
-//@RolesAllowed({"student", "instructor"})
+@RolesAllowed({"student", "instructor"})
 public class WorklogService {
     @Inject
     Validator validator;
