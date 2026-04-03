@@ -1,5 +1,6 @@
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import { workLogPostType } from "@/types/worklog/worklogTypes";
 
 export const userAtom = atom((get) => {
   const token = get(tokenAtom);
@@ -13,10 +14,17 @@ export const userAtom = atom((get) => {
     name: payload.name as string,
   };
 });
+
 export const worklogEditAtom = atom<{
   mode: "new" | "resubmit";
   weekNumber: string;
   tasks?: any[];
   previousSubmissions?: any[];
 } | null>(null);
-export const tokenAtom = atomWithStorage<string | null>("csc_480_token", null);
+
+export const pendingWorklogAtom = atom<workLogPostType | null>(null);
+
+export const tokenAtom = atomWithStorage<string | null>(
+  "csc_480_token",
+  null,
+);

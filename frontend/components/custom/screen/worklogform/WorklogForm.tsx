@@ -43,10 +43,11 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import {
   userAtom,
   worklogEditAtom,
+  pendingWorklogAtom,
 } from "@/components/custom/utils/context/state";
 import getWorklogDate from "../../utils/func/getDate";
 import { ChevronDown, ChevronRight, CalendarDays, Clock } from "lucide-react";
@@ -175,6 +176,8 @@ function PreviousSubmission({
 
 export function WorkLogForm() {
   const router = useRouter();
+  // ── FIX: read AND write pendingWorklogAtom so we can restore on back-nav ──
+  const [pendingWorklog, setPendingWorklog] = useAtom(pendingWorklogAtom);
   const worklogdayInfo = getWorklogDate(new Date("2026-01-26"));
   const [showSuccess, setShowSuccess] = useState(false);
   const [openTasks, setOpenTasks] = useState<Record<string, boolean>>({});
@@ -231,6 +234,7 @@ export function WorkLogForm() {
 
   useEffect(() => {
     if (worklogEdit) {
+      // ── Existing: populate from worklogEdit (resubmit via atom) ──
       if (worklogEdit.mode === "resubmit" && worklogEdit.tasks?.length) {
         const populatedTasks = worklogEdit.tasks.map((t: any) => ({
           taskName: t.taskName || "",
@@ -253,6 +257,7 @@ export function WorkLogForm() {
         setOpenTasks({});
       }
     } else if (weekFromUrl && modeFromUrl === "resubmit" && allWorklogs) {
+      // ── Existing: populate from URL params + fetched worklogs ──
       const weekLogs = allWorklogs
         .filter((log: any) => String(log.worklogName) === weekFromUrl)
         .sort(
@@ -279,8 +284,26 @@ export function WorkLogForm() {
         });
         setOpenTasks(openState);
       }
+    } else if (pendingWorklog?.taskList?.length) {
+      // ── FIX: restore form when student navigates back from confirm page ──
+      const populatedTasks = pendingWorklog.taskList.map((t: any) => ({
+        taskName: t.taskName || "",
+        goal: t.goal || "",
+        collaborators: t.collaborators || [],
+        assignedUser: t.assignedUser || "",
+        status: t.status || ("not-started" as const),
+        dueDate: t.dueDate || "",
+        creationDate: t.creationDate || dateCreated,
+        reflection: t.reflection || "",
+      }));
+      form.reset({ tasks: populatedTasks });
+      const openState: Record<string, boolean> = {};
+      populatedTasks.forEach((_: any, i: number) => {
+        openState[String(i)] = true;
+      });
+      setOpenTasks(openState);
     }
-  }, [worklogEdit, allWorklogs, weekFromUrl, modeFromUrl]);
+  }, [worklogEdit, allWorklogs, weekFromUrl, modeFromUrl, pendingWorklog]);
 
   const mutation = useMutation({
     mutationFn: submitWorkLog,
@@ -289,6 +312,8 @@ export function WorkLogForm() {
       form.reset({ tasks: [emptyTask] });
       setOpenTasks({});
       setWorklogEdit(null);
+      // ── FIX: clear pending worklog after a successful final submit ──
+      setPendingWorklog(null);
       setTimeout(() => {
         setShowSuccess(false);
         router.push("/");
@@ -306,22 +331,30 @@ export function WorkLogForm() {
   };
 
   function onSubmit(data: taskType) {
-    if (userInfo) {
-      const tasks = data.tasks.map((t) => ({
-        ...t,
-        assignedUser: userInfo.id,
-      }));
-      const obj: workLogPostType = {
-        worklogName: weekNumber,
-        authorName: userInfo.email,
-        dateCreated: dateCreated,
-        dateSubmitted: dateCreated,
-        collaborators: [],
-        taskList: tasks,
-      };
-      mutation.mutate(obj);
-    }
+    if (!userInfo) return;
+
+    const tasks = data.tasks.map((t) => ({
+      ...t,
+      assignedUser: userInfo.id,
+        collaborators: t.collaborators.filter((c) => c !== ""), // ← add this
+
+    }));
+
+    const obj: workLogPostType = {
+      worklogName: weekNumber,
+      authorName: userInfo.email,
+      dateCreated: dateCreated,
+      dateSubmitted: dateCreated,
+      collaborators: [],
+      taskList: tasks,
+    };
+
+    // Store in atom so confirm page can access it, and so back-nav restores it
+
+    setPendingWorklog(obj);
+    router.push("/worklogs/confirm");
   }
+
 
   return (
     <div className="p-4 sm:p-6 md:p-10">
