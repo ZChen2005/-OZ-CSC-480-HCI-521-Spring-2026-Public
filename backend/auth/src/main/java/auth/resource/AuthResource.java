@@ -95,7 +95,7 @@ public class AuthResource{
             .secure(ISHTTPS) //Set to true once https is up and running
             .path("/")
             .maxAge(REFRESH_MAX_AGE)
-            .sameSite(NewCookie.SameSite.STRICT)
+            .sameSite(NewCookie.SameSite.LAX)
             .build();
             
             return Response.ok(response).cookie(refreshCookie).build();
@@ -156,9 +156,9 @@ public class AuthResource{
                 .value(newRefreshToken)
                 .httpOnly(true)
                 .secure(ISHTTPS)
-                .path("/api/auth")
+                .path("/")
                 .maxAge(REFRESH_MAX_AGE)
-                .sameSite(NewCookie.SameSite.STRICT)
+                .sameSite(NewCookie.SameSite.LAX)
                 .build();
 
             return Response.ok(response).cookie(newCookie).build();

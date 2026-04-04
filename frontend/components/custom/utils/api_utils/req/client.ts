@@ -28,15 +28,6 @@ export function createClient(baseURL: string) {
     if (token) {
       token = token.replace(/^"(.*)"$/, "$1");
       config.headers.Authorization = `Bearer ${token}`;
-
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        console.log(
-          "[JWT] Issued:", new Date(payload.iat * 1000).toLocaleString(),
-          "| Expires:", new Date(payload.exp * 1000).toLocaleString(),
-          "| Remaining:", Math.round((payload.exp * 1000 - Date.now()) / 1000) + "s",
-        );
-      } catch {}
     }
 
     return config;
@@ -45,12 +36,10 @@ export function createClient(baseURL: string) {
   client.interceptors.response.use(
     (response) => response,
     async (error) => {
-      console.log("[INTERCEPTOR] Response error:", error.response?.status, error.config?.url);
       const originalRequest = error.config;
 
       if (error.response?.status === 401 && !originalRequest._retry) {
         if (isRefreshing) {
-          console.log("getting refresh token");
           return new Promise((resolve, reject) => {
             refreshQueue.push({ resolve, reject });
           }).then((token) => {
@@ -63,7 +52,6 @@ export function createClient(baseURL: string) {
         isRefreshing = true;
 
         try {
-          console.log("[REFRESH] Access token expired, requesting new token...");
           const AUTH_URL =
             env("NEXT_PUBLIC_AUTH_API_URL") || "http://localhost:9084/auth/api";
           const res = await axios.post(
@@ -72,7 +60,6 @@ export function createClient(baseURL: string) {
             { withCredentials: true },
           );
           const newToken = res.data.token;
-          console.log("[REFRESH] New access token received, retrying original request");
 
           localStorage.setItem("csc_480_token", JSON.stringify(newToken));
           store.set(tokenAtom, newToken);
@@ -83,7 +70,6 @@ export function createClient(baseURL: string) {
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return client(originalRequest);
         } catch (refreshError) {
-          console.log("[REFRESH] Refresh failed, logging out", refreshError);
           processQueue(refreshError, null);
 
           localStorage.removeItem("csc_480_token");
