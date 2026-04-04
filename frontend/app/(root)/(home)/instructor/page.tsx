@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { getAllWorkLogs } from "@/components/custom/utils/api_utils/worklogs/allReq";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { getAllWorkLogs, updateWorklog } from "@/components/custom/utils/api_utils/worklogs/allReq";
 import { useAtomValue } from "jotai";
 import { userAtom } from "@/components/custom/utils/context/state";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -113,6 +113,63 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
+function ReviewButton({ log }: { log: any }) {
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: () => {
+      // MongoDB _id can be {"$oid": "hex"} or a plain string
+      const id = typeof log._id === "object" ? log._id.$oid : log._id;
+      // Send only the fields the backend expects
+      const body = {
+        authorName: log.authorName,
+        worklogName: log.worklogName,
+        dateCreated: log.dateCreated,
+        dateSubmitted: log.dateSubmitted,
+        collaborators: log.collaborators ?? [],
+        taskList: log.taskList ?? [],
+        reviewed: !log.reviewed,
+      };
+      return updateWorklog(id, body);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["all-worklogs"] });
+    },
+  });
+
+  const isReviewed = log.reviewed === true;
+
+  return (
+    <Button
+      type="button"
+      variant={isReviewed ? "default" : "outline"}
+      size="sm"
+      disabled={mutation.isPending}
+      onClick={(e) => {
+        e.stopPropagation();
+        e.preventDefault();
+        mutation.mutate();
+      }}
+      className={
+        isReviewed
+          ? "relative z-10 bg-green-600 hover:bg-green-700 text-white text-xs cursor-pointer"
+          : "relative z-10 text-xs cursor-pointer"
+      }
+    >
+      {isReviewed ? (
+        <>
+          <CheckCircle2 className="h-3.5 w-3.5 mr-1" />
+          Reviewed
+        </>
+      ) : (
+        <>
+          <Clock className="h-3.5 w-3.5 mr-1" />
+          Review
+        </>
+      )}
+    </Button>
+  );
+}
+
 function StudentRow({ student }: { student: StudentSummary }) {
   const [open, setOpen] = useState(false);
 
@@ -220,9 +277,12 @@ function StudentRow({ student }: { student: StudentSummary }) {
                         Submitted {log.dateSubmitted}
                       </p>
                     </div>
-                    <span className="text-xs text-muted-foreground">
-                      {log.taskList?.length ?? 0} task(s)
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground">
+                        {log.taskList?.length ?? 0} task(s)
+                      </span>
+                      <ReviewButton log={log} />
+                    </div>
                   </div>
                   <CardContent className="pt-0 px-4 pb-3 space-y-2">
                     {(log.taskList ?? []).map((task: any, ti: number) => (

@@ -31,3 +31,8 @@ export async function getAllWorkLogs() {
     throw err;
   }
 }
+
+export async function updateWorklog(id: string, data: any) {
+  const res = await client.put(`${WORKLOG_API_URL}/id/${id}`, data);
+  return res.data;
+}
