@@ -6,6 +6,7 @@ import { AppSidebar } from "@/components/custom/screen/sidebar/Sidebar";
 import Topbar from "@/components/custom/screen/topbar/Topbar";
 import { PublicEnvScript } from 'next-runtime-env';
 import { Providers } from "@/provider";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,6 +42,7 @@ export default function RootLayout({
               <main className="w-full overflow-y-auto">{children}</main>
             </div>
           </div>
+          <Toaster position="top-right" richColors />
         </SidebarProvider>
       </body>
     </html>

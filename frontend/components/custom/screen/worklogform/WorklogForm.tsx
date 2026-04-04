@@ -664,18 +664,6 @@ export function WorkLogForm() {
         </CardContent>
       </Card>
 
-      {/* Previous submissions (read-only) */}
-      {previousSubmissions.length > 0 && (
-        <div className="mt-8 space-y-4">
-          {[...previousSubmissions].reverse().map((sub, i) => (
-            <PreviousSubmission
-              key={i}
-              submission={sub}
-              index={previousSubmissions.length - 1 - i}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 }
