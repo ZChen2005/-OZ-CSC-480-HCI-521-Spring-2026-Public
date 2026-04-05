@@ -293,17 +293,17 @@ const InstructorDashboard = () => {
 
   // Stats for selected week
   const totalStudents = allStudents.length;
-  const submitted = studentStatuses.filter((s) => s.status === "submitted").length;
-  const late = studentStatuses.filter((s) => s.status === "late").length;
-  const missing = studentStatuses.filter((s) => s.status === "missing").length;
-  const pending = studentStatuses.filter((s) => s.status === "pending").length;
+  const submitted = studentStatuses.filter((s: any) => s.status === "submitted").length;
+  const late = studentStatuses.filter((s: any) => s.status === "late").length;
+  const missing = studentStatuses.filter((s: any) => s.status === "missing").length;
+  const pending = studentStatuses.filter((s: any) => s.status === "pending").length;
   const reviewed = studentStatuses.filter(
-    (s) => s.logs.some((l: any) => l.reviewed === true),
+    (s: any) => s.logs.some((l: any) => l.reviewed === true),
   ).length;
 
   // Search filter
   const filtered = search
-    ? studentStatuses.filter((s) =>
+    ? studentStatuses.filter((s: any) =>
         s.email.toLowerCase().includes(search.toLowerCase()) ||
         s.name.toLowerCase().includes(search.toLowerCase()),
       )
@@ -461,7 +461,7 @@ const InstructorDashboard = () => {
                 </p>
               </div>
             ) : (
-              filtered.map((student) => (
+              filtered.map((student: any) => (
                 <StudentRow key={student.email} student={student} />
               ))
             )}
