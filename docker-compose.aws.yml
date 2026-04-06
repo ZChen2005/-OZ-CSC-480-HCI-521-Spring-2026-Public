@@ -3,8 +3,6 @@ services:
     build:
       context: ./frontend
     container_name: frontend-csc480-aws-container
-    ports:
-      - "7000:3000"
     env_file:
       - ./.secrets/frontend.env
     environment:
