@@ -71,6 +71,7 @@ public class WorklogRepository {
         Document newDoc = new Document();
 
         newDoc.put("authorName", entry.getAuthorName());
+        newDoc.put("worklogName", entry.getWorklogName());
         newDoc.put("dateCreated", entry.getDateCreated().format(dateTimeFormatter));
         newDoc.put("dateSubmitted", entry.getDateSubmitted().format(dateTimeFormatter));
         newDoc.put("collaborators", entry.getCollaborators());
@@ -83,34 +84,34 @@ public class WorklogRepository {
         return Response.status(Response.Status.OK).entity(newDoc.toJson()).build();
     }
 
-    public Response addWorklogDraft(WorklogEntry entry , String userID) {
+    public Response addWorklogDraft(WorklogEntry entry) {
 
         Document newDoc = new Document();
 
-        Optional.ofNullable(entry.getAuthorName())
-            .ifPresent(v -> newDoc.put("authorName", v));
-
+        
         Optional.ofNullable(entry.getDateCreated())
-            .ifPresent(v -> newDoc.put("dateCreated", v.format(dateTimeFormatter)));
-
+        .ifPresent(v -> newDoc.put("dateCreated", v.format(dateTimeFormatter)));
+        
         Optional.ofNullable(entry.getDateSubmitted())
-            .ifPresent(v -> newDoc.put("dateSubmitted", v.format(dateTimeFormatter)));
-
+        .ifPresent(v -> newDoc.put("dateSubmitted", v.format(dateTimeFormatter)));
+        
         Optional.ofNullable(entry.getCollaborators())
-            .ifPresent(v -> newDoc.put("collaborators", v));
-
-        Optional.ofNullable(entry.getWorklogName())
-            .ifPresent(v -> newDoc.put("worklogName", v));
-            
+        .ifPresent(v -> newDoc.put("collaborators", v));
+        
         Optional.ofNullable(entry.getTaskList())
-            .ifPresent(v -> newDoc.put("taskList", formatTask(v)));
+        .ifPresent(v -> newDoc.put("taskList", formatTask(v)));
+        
+        
 
-
+        
+        newDoc.put("authorName", entry.getAuthorName());
+        newDoc.put("worklogName", entry.getWorklogName());
         newDoc.put("isDraft", true);
         newDoc.put("reviewed", false);
 
         collection.findOneAndReplace(Filters.and(
             Filters.eq("authorName", entry.getAuthorName()),
+            Filters.eq("worklogName", entry.getWorklogName()),
             Filters.eq("isDraft", true)
 
         ), newDoc, new FindOneAndReplaceOptions().upsert(true));

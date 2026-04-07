@@ -30,7 +30,7 @@ import jakarta.ws.rs.core.SecurityContext;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @ApplicationScoped
-@RolesAllowed({"student", "instructor"})
+// @RolesAllowed({"student", "instructor"})
 public class WorklogService {
     @Inject
     Validator validator;
@@ -102,17 +102,14 @@ public class WorklogService {
 
 
     //Draft saving
-    //TODO NEED TO MAKE BASED ON ID NOT AUTHOR_NAME
     @PUT
-    @Path("/draft/{userId}")
+    @Path("/draft")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Operation(summary = "Save draft of userID in the database.")
-    public Response update(WorklogEntry worklog,
-        @Parameter(description = "studentID of owner.",required = true) 
-        @PathParam("userId") String userId) {
+    @Operation(summary = "Save draft of worklog in the database.")
+    public Response update(WorklogEntry worklog) {
         logger.log(Level.INFO, "PUT: update()");
-        return repo.addWorklogDraft(worklog, userId);
+        return repo.addWorklogDraft(worklog);
     }
 
 
