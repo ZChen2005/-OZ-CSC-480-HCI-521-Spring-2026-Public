@@ -191,6 +191,9 @@ public class WorklogRepository {
             Optional.ofNullable(task.getStatus())
                 .ifPresent(v -> newDoc.put("status", v));
 
+            Optional.ofNullable(task.getReflection())
+                .ifPresent(v -> newDoc.put("reflection", v));
+
 
             taskDocs.add(newDoc);
         }

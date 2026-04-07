@@ -18,6 +18,8 @@ public class Task {
 
     private ArrayList<String> collaborators;
 
+    private String reflection;
+
     public Task(){
         
     }
@@ -29,7 +31,7 @@ public class Task {
 
 
     public String getGoal() {
-        return goal;
+        return this.goal;
     }
 
 
@@ -41,7 +43,7 @@ public class Task {
 
 
     public String getAssignedUser() {
-        return assignedUser;
+        return this.assignedUser;
     }
 
 
@@ -53,7 +55,7 @@ public class Task {
 
 
     public LocalDate getDueDate() {
-        return dueDate;
+        return this.dueDate;
     }
 
 
@@ -65,7 +67,7 @@ public class Task {
 
 
     public LocalDate getCreationDate() {
-        return creationDate;
+        return this.creationDate;
     }
 
 
@@ -77,7 +79,7 @@ public class Task {
 
 
     public ArrayList<String> getCollaborators() {
-        return collaborators;
+        return this.collaborators;
     }
 
 
@@ -89,7 +91,7 @@ public class Task {
 
 
     public String getStatus() {
-        return status;
+        return this.status;
     }
 
 
@@ -99,13 +101,18 @@ public class Task {
     }
 
 
+    public String getReflection() {
+        return this.reflection;
+    }
+
+
+    public void setReflection(String reflection) {
+        this.reflection = reflection;
+    }
 
     
-
-    
-
     public String getTaskName() {
-        return taskName;
+        return this.taskName;
     }
 
 
