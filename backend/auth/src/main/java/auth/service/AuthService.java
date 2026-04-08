@@ -73,6 +73,13 @@ public class AuthService {
             refreshRepo.deleteByToken(token);
         }
 
+        public Document createInstuctor(String email, String name) {
+            if (repo.findByEmail(email) != null) {
+                return repo.updateUserRole(email, "instructor");
+            }
+            return repo.createUser(email, name, "instructor");
+        }
+
         public Document getUserByEmail(String email) {
             Document user = repo.findByEmail(email);
             if (user == null) throw new SecurityException("User not found");
@@ -81,5 +88,26 @@ public class AuthService {
 
         public List<Document> getAllUsers(){
             return repo.getAllUsers();
+        }
+
+        public List<Document> getInstructors(){
+            return repo.getUsersByRole("instructor");
+        }
+
+        public Document changeUserRole(String email, String newRole){
+            Document user = repo.findByEmail(email);
+            if(user==null){
+                throw new IllegalArgumentException("User not found");
+            }
+            if(newRole==null || (!newRole.equals("student") && !newRole.equals("instructor"))){
+                throw new IllegalArgumentException("Valid role is required");
+            }
+            repo.updateUserRole(email, newRole);
+            return user;
+
+        }
+
+        public Document removeUser(String email) {
+            return repo.removeUser(email);
         }
 }
