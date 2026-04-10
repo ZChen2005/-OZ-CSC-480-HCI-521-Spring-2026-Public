@@ -82,6 +82,7 @@ public class WorklogRepository {
 
         collection.deleteMany(Filters.and(
                 Filters.eq("worklogName", entry.getWorklogName()),
+                Filters.exists("isDraft", true),
                 Filters.eq("isDraft", true)
         ));
 
