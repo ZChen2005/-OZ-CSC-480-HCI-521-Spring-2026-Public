@@ -70,6 +70,15 @@ public class WorklogService {
         return repo.findByAuthor(authorName);
     }
 
+
+    @GET
+    @Path("debug/dbCollections")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listCollections() {
+        return repo.listCollections();
+    }
+
+
     @POST
     @Path("/")
     @Consumes(MediaType.APPLICATION_JSON)

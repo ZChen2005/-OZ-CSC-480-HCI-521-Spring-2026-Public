@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import jakarta.ws.rs.GET;
 import org.bson.Document;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
@@ -39,6 +40,9 @@ import worklog.application.classes.UserContext;
 public class WorklogRepository {
 
     private MongoCollection<Document> collection;
+
+    @Inject
+    private MongoDatabase db;
 
     @Inject
     Validator validator;
@@ -266,6 +270,14 @@ public class WorklogRepository {
         }
         return messages.build();
     }
-    
+
+    public Response listCollections() {
+        ArrayList<String> db_collections = new ArrayList<>();
+        for (String name : db.listCollectionNames()) {
+            db_collections.add(name);
+        }
+
+        return Response.ok(db_collections).build();
+    }
     
 }

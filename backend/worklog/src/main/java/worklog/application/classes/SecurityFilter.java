@@ -19,6 +19,14 @@ public class SecurityFilter implements ContainerRequestFilter {
     public void filter(ContainerRequestContext requestContext) {
         String classID = token.getClaim("classID");
 
+        /*
+         * THE BELOW IF STATEMENT SHOULD ONLY BE UNCOMMENTED IF TESTING ON LOCAL BRANCH
+         * THIS IS A BIG SECURITY RISK IN DEPLOYMENT CODE, ONLY HERE FOR SIMPLIFYING TESTING
+         */
+//        if (classID == null) {
+//            classID = "DEVMODE";
+//        }
+
         userContext.setClassID(classID);
     }
 
