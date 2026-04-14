@@ -20,6 +20,7 @@ import org.bson.types.ObjectId;
 
 import com.mongodb.MongoClientSettings;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
@@ -40,10 +41,8 @@ import worklog.application.classes.UserContext;
 @ApplicationScoped // Add this so CDI can manage this class
 public class WorklogRepository {
 
-    private MongoCollection<Document> collection;
-
     @Inject
-    private MongoDatabase db;
+    private MongoClient mongoCl;
 
     @Inject
     Validator validator;
@@ -52,22 +51,37 @@ public class WorklogRepository {
     UserContext userContext;
     
     Bson excludeDraft = Filters.or(
-            Filters.exists("isDraft", false),
-            Filters.eq("isDraft", false));
+        Filters.exists("isDraft", false),
+        Filters.eq("isDraft", false)
+    );
 
-    @Inject
-    public void setCollection(MongoDatabase db) {
-        CodecRegistry pojoCodecRegistry = fromRegistries(
-                MongoClientSettings.getDefaultCodecRegistry(),
-                fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+    private static final CodecRegistry POJO_CODEC_REGISTRY = fromRegistries(
+            MongoClientSettings.getDefaultCodecRegistry(),
+            fromProviders(PojoCodecProvider.builder().automatic(true).build())
+        );
 
-        // Apply the registry to the database provided by the producer
-        MongoDatabase codecDb = db.withCodecRegistry(pojoCodecRegistry);
-
-        this.collection = codecDb.getCollection(userContext.getClassID());
+    private MongoCollection<Document> getClassCollection() {
+        return mongoCl
+                .getDatabase(userContext.getClassID())
+                .withCodecRegistry(POJO_CODEC_REGISTRY)
+                .getCollection("worklogs");
     }
+    
+
+    // @Inject
+    // public void setCollection(MongoDatabase db) {
+    //     CodecRegistry pojoCodecRegistry = fromRegistries(
+    //             MongoClientSettings.getDefaultCodecRegistry(),
+    //             fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+
+    //     // Apply the registry to the database provided by the producer
+    //     MongoDatabase codecDb = db.withCodecRegistry(pojoCodecRegistry);
+
+    //     this.collection = codecDb.getCollection(userContext.getClassID());
+    // }
 
     public Response addWorklog(WorklogEntry entry) {
+        MongoCollection<Document> collection = getClassCollection();
         JsonArray violations = getViolations(entry);
 
         if (!violations.isEmpty()) {
@@ -96,6 +110,7 @@ public class WorklogRepository {
     }
 
     public Response addWorklogDraft(WorklogEntry entry) {
+        MongoCollection<Document> collection = getClassCollection();
 
         Document newDoc = new Document();
 
@@ -142,7 +157,7 @@ public class WorklogRepository {
     }
 
     public Response deleteAll() {
-        collection.drop();
+        getClassCollection().drop();
         return Response.status(Response.Status.OK).entity("[\"Dropped collection\"]").build();
     }
 
@@ -154,6 +169,7 @@ public class WorklogRepository {
 
     // input null for getAll
     private Response responseByQuery(Bson query) {
+        MongoCollection<Document> collection = getClassCollection();
         StringWriter sb = new StringWriter();
         try {
             sb.append("[");
@@ -222,6 +238,7 @@ public class WorklogRepository {
     // (Xander): ^May not be needed, worklog aspects dont really have to be updated
     // once they're in the db.... question for requirments?
     public Response updateWorklog(String id, WorklogEntry updatedEntry, boolean isInstructor) {
+        MongoCollection<Document> collection = getClassCollection();
         Document newDoc = new Document();
 
         newDoc.put("authorName", updatedEntry.getAuthorName());
@@ -253,6 +270,7 @@ public class WorklogRepository {
     }
 
     public Response deleteWorklog(String id) {
+        MongoCollection<Document> collection = getClassCollection();
 
         ObjectId oid; // ID of mongo collection entry
         try {
@@ -279,11 +297,21 @@ public class WorklogRepository {
 
     public Response listCollections() {
         ArrayList<String> db_collections = new ArrayList<>();
-        for (String name : db.listCollectionNames()) {
+         for (String name : mongoCl.getDatabase("appdb").listCollectionNames()) {
             db_collections.add(name);
         }
 
         return Response.ok(db_collections).build();
     }
+
+    public Response listDBs() {
+        ArrayList<String> db_names = new ArrayList<>();
+         for (String name : mongoCl.listDatabaseNames()) {
+            db_names.add(name);
+        }
+
+        return Response.ok(db_names).build();
+    }
+
     
 }

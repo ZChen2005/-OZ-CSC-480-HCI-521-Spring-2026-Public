@@ -29,7 +29,7 @@ import jakarta.ws.rs.core.SecurityContext;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 @ApplicationScoped
-@RolesAllowed({"student", "instructor"})
+// @RolesAllowed({"student", "instructor"})
 public class WorklogService {
     @Inject
     Validator validator;
@@ -75,6 +75,13 @@ public class WorklogService {
     @Produces(MediaType.APPLICATION_JSON)
     public Response listCollections() {
         return repo.listCollections();
+    }
+
+    @GET
+    @Path("debug/dbs")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response listDBs() {
+        return repo.listDBs();
     }
 
 
