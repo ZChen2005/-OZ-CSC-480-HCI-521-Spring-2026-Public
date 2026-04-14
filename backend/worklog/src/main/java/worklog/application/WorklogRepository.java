@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.bson.Document;
+import org.bson.json.JsonWriterSettings;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
@@ -137,6 +138,12 @@ public class WorklogRepository {
         return Response.status(Response.Status.OK).entity("[\"Dropped collection\"]").build();
     }
 
+    private static final JsonWriterSettings JSON_SETTINGS = JsonWriterSettings.builder()
+            .dateTimeConverter((value, writer) -> writer.writeString(
+                    new java.util.Date(value).toInstant().toString()))
+            .objectIdConverter((value, writer) -> writer.writeString(value.toHexString()))
+            .build();
+
     // input null for getAll
     private Response responseByQuery(Bson query) {
         StringWriter sb = new StringWriter();
@@ -156,7 +163,7 @@ public class WorklogRepository {
                     sb.append(",");
                 else
                     first = false;
-                sb.append(d.toJson());
+                sb.append(d.toJson(JSON_SETTINGS));
             }
             sb.append("]");
         } catch (Exception e) {
