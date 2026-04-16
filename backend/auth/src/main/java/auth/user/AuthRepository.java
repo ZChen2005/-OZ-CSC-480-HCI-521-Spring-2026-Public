@@ -79,4 +79,8 @@ public class AuthRepository{
         return user;
     }
 
+    public List<Document> getUsersFromClass(String classID) {
+        return collection.find(new Document("classID", classID)).into(new ArrayList<>());
+    }
+
 }

@@ -114,4 +114,8 @@ public class AuthService {
         public Document removeUser(String email) {
             return repo.removeUser(email);
         }
+
+        public List<Document> getUsersFromClass(String classID) {
+            return repo.getUsersFromClass(classID);
+        }
 }

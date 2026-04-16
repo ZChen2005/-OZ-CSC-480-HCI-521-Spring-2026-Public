@@ -226,9 +226,26 @@ public class AuthResource{
         }
     }
 
+    @GET
+    @Path("/users/class/{classID}")   
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUsersFromClass(@PathParam("classID") String classID){
+        try {
+            List<Document> users = authservice.getUsersFromClass(classID);
+            return Response.ok(users).build();
+            
+        } catch(Exception e){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+
+    }
+
     @PUT
     @Path("/users/class/{email}")
-    // @RolesAllowed("instructor")
+    @RolesAllowed("instructor")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response addUserToClass(@PathParam("email") String email, String classID){
@@ -297,7 +314,7 @@ public class AuthResource{
 
     @PUT
     @Path("/instructor/create/{email}")
-    // @RolesAllowed("instructor")// we Might want to add admin role later to manage instructors (this line restructs what users can call this endpoint)
+    @RolesAllowed("instructor")// we Might want to add admin role later to manage instructors (this line restructs what users can call this endpoint)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateInstructor(@PathParam("email") String email){
