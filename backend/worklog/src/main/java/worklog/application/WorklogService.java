@@ -94,6 +94,7 @@ public class WorklogService {
     public Response getWorklogByDateSubmitted(@jakarta.ws.rs.PathParam("dateSubmitted") LocalDateTime dateSubmitted) {
         logger.log(Level.INFO, "GET: getWorklogByDateSubmitted()");
         return repo.getByDateSubmitted(dateSubmitted);
+    }
 
     @GET
     @Path("debug/dbCollections")
