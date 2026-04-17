@@ -70,6 +70,8 @@ public class AuthResource{
             String email = user.getString("email");
             String name = user.getString("name") != null ? user.getString("name") : email;
             String role = user.getString("role");
+            String preferredName = user.getString("preferredName");
+            List<String> team = user.getList("team", String.class);
 
 
             // build JWT (shortlived)
@@ -80,6 +82,8 @@ public class AuthResource{
             .claim("name", name)
             .claim("role", role)
             .claim("groups", new String[]{role})
+            .claim("preferredName", preferredName)
+            .claim("team", team)
             .buildJwt()
             .compact();
 
@@ -87,11 +91,13 @@ public class AuthResource{
             String refreshToken = refreshDoc.getString("token");
 
             // return JWT TO FRONTEND
-            Map<String, String> response = new HashMap<>();
+            Map<String, Object> response = new HashMap<>();
             response.put("token", accessToken);
             response.put("email", email);
             response.put("name", name);
             response.put("role", role);
+            response.put("preferredName", preferredName);
+            response.put("team", team);
             // System.out.println(response);
             
             NewCookie refreshCookie = new NewCookie.Builder(REFRESH_TOKEN_NAME)
@@ -134,6 +140,8 @@ public class AuthResource{
             String id = user.getObjectId("_id").toHexString();
             String name = user.getString("name") != null ? user.getString("name") : email;
             String role = user.getString("role");
+            String preferredName = user.getString("preferredName");
+            List<String> team = user.getList("team", String.class);
 
             // delete old token, issue new one
             authservice.revokeRefreshToken(refreshToken);
@@ -148,14 +156,18 @@ public class AuthResource{
                 .claim("name", name)
                 .claim("role", role)
                 .claim("groups", new String[]{role})
+                .claim("preferredName", preferredName)
+                .claim("team", team)
                 .buildJwt()
                 .compact();
 
-            Map<String, String> response = new HashMap<>();
+            Map<String, Object> response = new HashMap<>();
             response.put("token", accessToken);
             response.put("email", email);
             response.put("name", name);
             response.put("role", role);
+            response.put("preferredName", preferredName);
+            response.put("team", team);
 
             NewCookie newCookie = new NewCookie.Builder(REFRESH_TOKEN_NAME)
                 .value(newRefreshToken)

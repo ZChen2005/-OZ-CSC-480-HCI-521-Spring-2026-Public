@@ -25,7 +25,7 @@ public class AuthRepository{
         return collection.find(new Document("email", email)).first();
     }
 
-    public Document createUser(String email, String name, String role){
+    public Document createUser(String email, String name, String role, String preferredName, List<String> team){
         if(role==null || (!role.equals("student") && !role.equals("instructor"))){
             role = "student";
         }
@@ -33,6 +33,10 @@ public class AuthRepository{
             .append("email", email)
             .append("name", name)
             .append("role", role)
+            .append("preferredName", preferredName)
+            .append("team", team)
+            .append("classStanding", "")
+            .append("isArchived", false)
             .append("createdAt", Instant.now());
         collection.insertOne(newUser);
         return newUser;
