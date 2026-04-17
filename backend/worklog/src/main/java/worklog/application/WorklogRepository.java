@@ -236,6 +236,8 @@ public class WorklogRepository {
 
             Optional.ofNullable(task.getReflection())
                     .ifPresent(v -> newDoc.put("reflection", v));
+            Optional.ofNullable(task.getCollabDescription())
+                    .ifPresent(v -> newDoc.put("collabDescription", v));
 
             taskDocs.add(newDoc);
         }
