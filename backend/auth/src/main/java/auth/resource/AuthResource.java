@@ -310,5 +310,122 @@ public class AuthResource{
         }
     }
 
+    @PUT
+    @Path("/user/addTeam/{email}/{team}")
+    @RolesAllowed("instructor")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response addUserTeam(@PathParam("email") String email, @PathParam("team") String team){
+        try {
+            Document user = authservice.addUserTeam(email, team);
+            return Response.ok(user).build();
+            
+        } catch(Exception e){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+    }
+
+    @PUT
+    @Path("/user/removeTeam/{email}/{team}")
+    @RolesAllowed("instructor")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response removeUserTeam(@PathParam("email") String email, @PathParam("team") String team){
+        try {
+            Document user = authservice.removeUserTeam(email, team);
+            return Response.ok(user).build();
+            
+        } catch(Exception e){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+    }
+
+    @PUT
+    @Path("/user/updatePreferredName/{email}/{preferredName}")
+    @RolesAllowed("instructor")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateUserPreferredName(@PathParam("email") String email, @PathParam("preferredName") String preferredName){
+        try {
+            Document user = authservice.updateUserPreferredName(email, preferredName);
+            return Response.ok(user).build();
+            
+        } catch(Exception e){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+    }
+
+    @PUT
+    @Path("/user/updateStanding/{email}/{classStanding}")
+    @RolesAllowed("instructor")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response updateUserClassStanding(@PathParam("email") String email, @PathParam("classStanding") String classStanding){
+        try {
+            Document user = authservice.updateUserClassStanding(email, classStanding);
+            return Response.ok(user).build();
+            
+        } catch(Exception e){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+    }
+
+    @PUT
+    @Path("/user/archive/{email}")
+    @RolesAllowed("instructor")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response archiveUser(@PathParam("email") String email){
+        try {
+            Document user = authservice.archiveUser(email);
+            return Response.ok(user).build();
+            
+        } catch(Exception e){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+    }
+
+    @PUT
+    @Path("/user/unarchive/{email}")
+    @RolesAllowed("instructor")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response unarchiveUser(@PathParam("email") String email){
+        try {
+            Document user = authservice.unarchiveUser(email);
+            return Response.ok(user).build();
+            
+        } catch(Exception e){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+    }
+
+    @GET
+    @Path("/user/archived")
+    @RolesAllowed("instructor")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getArchivedUsers(){
+        try {
+            List<Document> users = authservice.getArchivedUsers();
+            return Response.ok(users).build();
+        } catch(Exception e){
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity(e.getMessage())
+                    .build();
+        }
+    }  
+
 
 }

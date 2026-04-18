@@ -110,4 +110,88 @@ public class AuthService {
         public Document removeUser(String email) {
             return repo.removeUser(email);
         }
+
+        public Document addUserTeam(String email, String team){
+            Document user = repo.findByEmail(email);
+            if(user==null){
+                throw new IllegalArgumentException("User not found");
+            }
+            if(team==null){
+                throw new IllegalArgumentException("Valid team is required");
+            }
+
+            List<String> teams = user.getList("team", String.class);
+                
+            if (teams.contains(team)) {
+                throw new IllegalArgumentException("User already in team");
+            }
+             teams.add(team);
+             repo.updateUserTeam(email, teams);
+             return user;
+        }
+
+        public Document removeUserTeam(String email, String team){
+            Document user = repo.findByEmail(email);
+            if(user==null){
+                throw new IllegalArgumentException("User not found");
+            }
+            if(team==null){
+                throw new IllegalArgumentException("Valid team is required");
+            }
+
+            List<String> teams = user.getList("team", String.class);
+                
+            if (!teams.contains(team)) {
+                throw new IllegalArgumentException("User not in team");
+            }
+            teams.remove(team);
+            repo.updateUserTeam(email, teams);
+            return user;
+        }
+
+        public Document updateUserPreferredName(String email, String preferredName){
+            Document user = repo.findByEmail(email);
+            if(user==null){
+                throw new IllegalArgumentException("User not found");
+            }
+            if(preferredName==null || preferredName.trim().isEmpty()){
+                throw new IllegalArgumentException("Valid preferred name is required");
+            }
+            repo.updateUserPreferredName(email, preferredName);
+            return user;
+        }
+
+        public Document updateUserClassStanding(String email, String classStanding){
+            Document user = repo.findByEmail(email);
+            if(user==null){
+                throw new IllegalArgumentException("User not found");
+            }
+            if(classStanding==null || classStanding.trim().isEmpty()){
+                throw new IllegalArgumentException("Valid class standing is required");
+            }
+            repo.updateUserClassStanding(email, classStanding);
+            return user;
+         }
+
+        public Document archiveUser(String email) {
+            Document user = repo.findByEmail(email);
+            if(user==null){
+                throw new IllegalArgumentException("User not found");
+            }
+            repo.archiveUser(email);
+            return user;
+        }
+
+        public Document unarchiveUser(String email) {
+            Document user = repo.findByEmail(email);
+            if(user==null){
+                throw new IllegalArgumentException("User not found");
+            }
+            repo.unarchiveUser(email);
+            return user;
+        }
+
+        public List<Document> getArchivedUsers(){
+            return repo.getArchivedUsers();
+        }
 }

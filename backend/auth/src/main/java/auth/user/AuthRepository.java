@@ -64,4 +64,53 @@ public class AuthRepository{
         return user;
     }
 
+    public Document updateUserTeam(String email, List<String> teams){
+        Document user = findByEmail(email);
+        if(user!=null){
+            user.put("team", teams);
+            collection.replaceOne(new Document("email", email), user);
+        }
+        return user;
+    }
+
+     public Document updateUserPreferredName(String email, String preferredName){
+        Document user = findByEmail(email);
+        if(user!=null){
+            user.put("preferredName", preferredName);
+            collection.replaceOne(new Document("email", email), user);
+        }
+        return user;
+     }
+
+     public Document updateUserClassStanding(String email, String classStanding){
+        Document user = findByEmail(email);
+        if(user!=null){
+            user.put("classStanding", classStanding);
+            collection.replaceOne(new Document("email", email), user);
+        }
+        return user;
+     }
+
+     public Document archiveUser(String email) {
+        Document user = findByEmail(email);
+        if(user!=null){
+            user.put("isArchived", true);
+            collection.replaceOne(new Document("email", email), user);
+        }
+        return user;
+     }
+
+     public Document unarchiveUser(String email) {
+        Document user = findByEmail(email);
+        if(user!=null){
+            user.put("isArchived", false);
+            collection.replaceOne(new Document("email", email), user);
+        }
+        return user;
+     }
+
+     public List<Document> getArchivedUsers() {
+        return collection.find(new Document("isArchived", true)).into(new ArrayList<>());
+     }
+
 }
