@@ -11,6 +11,7 @@ public class User{
     private List<String> team;
     private String classStanding;
     private Boolean isArchived;
+    private String classID;
 
     public User(){}
 
@@ -24,6 +25,21 @@ public class User{
             this.team = team;
             this.classStanding = classStanding;
             this.isArchived = isArchived;
+        }
+
+    public User(String email, String name, String role, String createdAt, String classID){
+            this.email = email;
+            this.name = name;
+            this.role = role;
+            this.createdAt = createdAt;
+            this.classID = classID;
+        }
+
+    public User(String email, String name, String role, String createdAt){
+            this.email = email;
+            this.name = name;
+            this.role = role;
+            this.createdAt = createdAt;
         }
 
         public String getEmail(){
@@ -88,5 +104,13 @@ public class User{
 
         public void setIsArchived(Boolean isArchived){
             this.isArchived = isArchived;
+        }
+
+        public String getClassID(){
+            return classID;
+        }
+        
+        public void setClassID(String classID){
+            this.classID = classID;
         }
     }

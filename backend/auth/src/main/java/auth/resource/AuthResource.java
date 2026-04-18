@@ -9,11 +9,14 @@ import java.util.Map;
 
 
 import org.bson.Document;
+import org.eclipse.microprofile.openapi.annotations.Operation;
 
 import com.ibm.websphere.security.jwt.Claims;
 import com.ibm.websphere.security.jwt.JwtBuilder;
+import com.mongodb.client.MongoCollection;
 
 import auth.service.AuthService;
+import auth.user.StudentClass;
 import auth.user.User;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.enterprise.context.RequestScoped;
@@ -52,6 +55,7 @@ public class AuthResource{
     @Path("/login")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Logs user into account")
     // login should be public so anyone can call it
     public Response login(Map<String, String> body){
         try{
@@ -72,20 +76,24 @@ public class AuthResource{
             String role = user.getString("role");
             String preferredName = user.getString("preferredName");
             List<String> team = user.getList("team", String.class);
+            String classID = user.getString("classID");
 
 
             // build JWT (shortlived)
-            String accessToken = JwtBuilder.create("jwtAuthBuilder")
-            .claim(Claims.SUBJECT, email)
-            .claim("id", id)
-            .claim("email", email)
-            .claim("name", name)
-            .claim("role", role)
-            .claim("groups", new String[]{role})
-            .claim("preferredName", preferredName)
-            .claim("team", team)
-            .buildJwt()
-            .compact();
+            JwtBuilder builder = JwtBuilder.create("jwtAuthBuilder")
+                .claim(Claims.SUBJECT, email)
+                .claim("id", id)
+                .claim("email", email)
+                .claim("name", name)
+                .claim("role", role)
+                .claim("groups", new String[]{role})
+                .claim("preferredName", preferredName)
+                .claim("team", team);
+
+            if (classID != null && !classID.isBlank()) {
+                    builder = builder.claim("classID", classID);
+            }
+            String accessToken = builder.buildJwt().compact();
 
             Document refreshDoc = authservice.createRefreshToken(id, email);
             String refreshToken = refreshDoc.getString("token");
@@ -99,6 +107,9 @@ public class AuthResource{
             response.put("preferredName", preferredName);
             response.put("team", team);
             // System.out.println(response);
+            if (classID != null) {
+                response.put("classID", classID);
+            }
             
             NewCookie refreshCookie = new NewCookie.Builder(REFRESH_TOKEN_NAME)
             .value(refreshToken)
@@ -125,6 +136,7 @@ public class AuthResource{
     @POST
     @Path("/refresh")
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Refreshes token")
     public Response refresh(@CookieParam(REFRESH_TOKEN_NAME) String refreshToken) {
         try {
             if (refreshToken == null || refreshToken.isEmpty()) {
@@ -142,6 +154,7 @@ public class AuthResource{
             String role = user.getString("role");
             String preferredName = user.getString("preferredName");
             List<String> team = user.getList("team", String.class);
+            String classID = user.getString("classID");
 
             // delete old token, issue new one
             authservice.revokeRefreshToken(refreshToken);
@@ -149,17 +162,19 @@ public class AuthResource{
             String newRefreshToken = newRefreshDoc.getString("token");
 
             // Issue new access token
-            String accessToken = JwtBuilder.create("jwtAuthBuilder")
+            JwtBuilder builder = JwtBuilder.create("jwtAuthBuilder")
                 .claim(Claims.SUBJECT, email)
                 .claim("id", id)
                 .claim("email", email)
                 .claim("name", name)
                 .claim("role", role)
-                .claim("groups", new String[]{role})
                 .claim("preferredName", preferredName)
                 .claim("team", team)
-                .buildJwt()
-                .compact();
+                .claim("groups", new String[]{role});
+            if (classID != null && !classID.isBlank()) {
+                    builder = builder.claim("classID", classID);
+            }
+            String accessToken = builder.buildJwt().compact();
 
             Map<String, Object> response = new HashMap<>();
             response.put("token", accessToken);
@@ -168,6 +183,9 @@ public class AuthResource{
             response.put("role", role);
             response.put("preferredName", preferredName);
             response.put("team", team);
+            if (classID != null && !classID.isBlank()) {
+                response.put("classID", classID);
+            }
 
             NewCookie newCookie = new NewCookie.Builder(REFRESH_TOKEN_NAME)
                 .value(newRefreshToken)
@@ -194,6 +212,7 @@ public class AuthResource{
 
     @POST
     @Path("/logout")
+    @Operation(summary = "Logs user out of account")
     public Response logout(@CookieParam(REFRESH_TOKEN_NAME) String refreshToken) {
         if (refreshToken != null) {
             authservice.revokeRefreshToken(refreshToken);
@@ -213,8 +232,9 @@ public class AuthResource{
 
 
     @GET
-    @Path("/users")
+    @Path("/users") //TODO Does not actually get all users rn only gets users in current class
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Gets all users")
     public Response getAllUsers(){
         try {
             List<Document> users = authservice.getAllUsers();
@@ -226,11 +246,69 @@ public class AuthResource{
         }
     }
 
+    @GET
+    @Path("/users/class/{classID}")   
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Gets all users in a given class.")
+    public Response getUsersFromClass(@PathParam("classID") String classID){
+        try {
+            List<Document> users = authservice.getUsersFromClass(classID);
+            return Response.ok(users).build();
+            
+        } catch(Exception e){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+
+    }
+
+    @PUT
+    @Path("/users/class/{email}")
+    @RolesAllowed("instructor")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Adds a user to the given class.")
+    public Response addUserToClass(@PathParam("email") String email, String classID){
+        try {
+            Document user = authservice.addUserToClass(email, classID);
+            return Response.ok(user).build();
+            
+        } catch(Exception e){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+
+    }
+
+    @DELETE
+    @Path("/users/class/{email}")
+    @RolesAllowed("instructor")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Removes the user from their current class")
+    public Response removeUserFromClass(@PathParam("email") String email){
+        try {
+            Document user = authservice.removeUserFromClass(email);
+            return Response.ok(user).build();
+            
+        } catch(Exception e){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        }
+
+    }
+
+
     @DELETE
     @Path("/users/remove/{email}")
     @RolesAllowed("instructor")// we Might want to add admin role later to manage instructors (this line restructs what users can call this endpoint)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Deletes user from database")
     public Response deleteUser(@PathParam("email") String email){
         try {
             Document user = authservice.removeUser(email);
@@ -244,9 +322,10 @@ public class AuthResource{
     }
     
     @GET
-    @Path("/instructors")
+    @Path("/instructors") 
     @RolesAllowed("instructor")// we Might want to add admin role later to manage instructors (this line restructs what users can call this endpoint)
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Gets all instructors of current class")
     public Response getInstructors(){
         try {
             List<Document> users = authservice.getInstructors();
@@ -263,6 +342,7 @@ public class AuthResource{
     @RolesAllowed("instructor")// we Might want to add admin role later to manage instructors (this line restructs what users can call this endpoint)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Creates instructor in current class")
     public Response createInstructor(User user){
         try {
             Document userDoc = authservice.createInstuctor(user.getEmail(), user.getName());
@@ -281,6 +361,7 @@ public class AuthResource{
     @RolesAllowed("instructor")// we Might want to add admin role later to manage instructors (this line restructs what users can call this endpoint)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Creates/updates user into instructor")
     public Response updateInstructor(@PathParam("email") String email){
         try {
             Document user = authservice.changeUserRole(email, "instructor");
@@ -298,6 +379,7 @@ public class AuthResource{
     @RolesAllowed("instructor")// we Might want to add admin role later to manage instructors (this line restructs what users can call this endpoint)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+     @Operation(summary = "Removes instructor role from user")
     public Response removeInstructor(@PathParam("email") String email){
         try {
             Document user = authservice.changeUserRole(email, "student");
@@ -319,11 +401,28 @@ public class AuthResource{
         try {
             Document user = authservice.addUserTeam(email, team);
             return Response.ok(user).build();
-            
         } catch(Exception e){
-                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                 .entity(e.getMessage())
                 .build();
+        }
+    }
+            
+    @POST
+    @Path("/class/create")
+    @RolesAllowed("instructor")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+     @Operation(summary = "Creates a class")
+    public Response createClass(StudentClass studentClass){
+        try {
+            Document classDoc = authservice.createClass(studentClass);
+            return Response.ok(classDoc).build();
+            
+        } catch(Exception e){
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            .entity(e.getMessage())
+            .build();
         }
     }
 
@@ -426,6 +525,60 @@ public class AuthResource{
                     .build();
         }
     }  
+
+    @GET
+    @Path("/class/{classID}")
+    @RolesAllowed("instructor")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Gets class data of a given classID")
+    public Response getStudentClass(@PathParam("classID") String classID){
+        try {
+            Document classDoc = authservice.getStudentClass(classID);
+            return Response.ok(classDoc).build();
+            
+        } catch(Exception e){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        } 
+    }
+
+    @GET
+    @Path("/classes")
+    @RolesAllowed("instructor")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Gets all current classes")
+    public Response getClasses(){
+        try {
+            List<Document> classDoc = authservice.getClasses();
+            return Response.ok(classDoc).build();
+            
+        } catch(Exception e){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        } 
+    }
+
+    @DELETE
+    @Path("/class/delete/{classID}")
+    @RolesAllowed("instructor")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Operation(summary = "Deletes a given class by given classID")
+    public Response createClass(@PathParam("classID") String classID){
+        try {
+            Document classDoc = authservice.removeClass(classID);
+            return Response.ok(classDoc).build();
+            
+        } catch(Exception e){
+                return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                .entity(e.getMessage())
+                .build();
+        } 
+    }
 
 
 }
