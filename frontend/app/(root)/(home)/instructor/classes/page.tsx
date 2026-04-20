@@ -207,8 +207,10 @@ export default function ClassesPage() {
     );
   }
 
+  const classIDValid =
+    !!classID.trim() && !/\s/.test(classID);
   const canSubmit =
-    !!classID.trim() &&
+    classIDValid &&
     !!semesterStartDate &&
     !!semsesterEndDate &&
     !!studendAccessEndDate;
@@ -704,8 +706,19 @@ export default function ClassesPage() {
               <Input
                 placeholder="e.g. CSC480-Sp2026"
                 value={classID}
-                onChange={(e) => setClassID(e.target.value)}
+                onChange={(e) => setClassID(e.target.value.replace(/\s+/g, ""))}
+                onKeyDown={(e) => {
+                  if (e.key === " ") e.preventDefault();
+                }}
               />
+              <p className="text-xs text-muted-foreground">
+                No spaces allowed. This becomes the database name.
+              </p>
+              {classID.length > 0 && !classIDValid && (
+                <p className="text-xs text-red-600">
+                  Class ID cannot contain spaces.
+                </p>
+              )}
             </div>
             <div className="grid sm:grid-cols-3 gap-3">
               <div className="space-y-1.5">
