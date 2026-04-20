@@ -83,17 +83,16 @@ export default function NotificationPage() {
       const dueDate = new Date(semesterStart);
       dueDate.setDate(dueDate.getDate() + w * 7);
       dueDate.setHours(23, 59, 0, 0);
-      const diffDays = Math.floor(
-        (now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24),
-      );
+      const diffDays = calendarDaysBetween(dueDate, now);
       missingWeeks.push({ week: w, overdueDays: diffDays > 0 ? diffDays : 0 });
     }
   }
 
-  const sortedWorklogs = [...worklogs].sort(
-    (a: any, b: any) =>
-      (parseInt(b.worklogName) || 0) - (parseInt(a.worklogName) || 0),
-  );
+  const sortedWorklogs = [...worklogs].sort((a: any, b: any) => {
+    const at = a.dateSubmitted ? new Date(a.dateSubmitted).getTime() : 0;
+    const bt = b.dateSubmitted ? new Date(b.dateSubmitted).getTime() : 0;
+    return bt - at;
+  });
 
   return (
     <div className="p-3 sm:p-4 md:p-6 w-full">
