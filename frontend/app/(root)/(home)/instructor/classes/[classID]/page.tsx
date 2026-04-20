@@ -22,7 +22,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Trash2, CheckCircle2, Clock } from "lucide-react";
 import { toast } from "sonner";
 import StudentSearchPicker from "@/components/custom/instructor/classes/StudentSearchPicker";
-import { fmtDateTime } from "@/components/custom/utils/func/formatDate";
+import { fmtDate, fmtDateTime } from "@/components/custom/utils/func/formatDate";
+import { Breadcrumbs } from "@/components/custom/ui/Breadcrumbs";
 
 export default function ClassDetailPage() {
   const userInfo = useAtomValue(userAtom);
@@ -115,21 +116,21 @@ export default function ClassDetailPage() {
 
   return (
     <div className="p-4 sm:p-6 md:p-10">
-      <Link href="/instructor/classes">
-        <Button variant="ghost" className="mb-4 gap-2 cursor-pointer">
-          <ArrowLeft className="h-4 w-4" />
-          Back to classes
-        </Button>
-      </Link>
+      <Breadcrumbs
+        items={[
+          { label: "Manage Class", href: "/instructor/classes" },
+          { label: classData.classID },
+        ]}
+      />
 
       <div className="mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold">{classData.classID}</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Semester: {classData.semesterStartDate || "—"} —{" "}
-          {classData.semsesterEndDate || "—"}
+          Semester: {fmtDate(classData.semesterStartDate)} —{" "}
+          {fmtDate(classData.semsesterEndDate)}
         </p>
         <p className="text-xs text-muted-foreground">
-          Student access ends: {classData.studendAccessEndDate || "—"}
+          Student access ends: {fmtDate(classData.studendAccessEndDate)}
         </p>
       </div>
 

@@ -66,7 +66,7 @@ export default function NotificationPage() {
       </div>
     );
 
-  const worklogs = data ?? [];
+  const worklogs = (data ?? []).filter((log: any) => !log.isDraft);
 
   const semesterStart = new Date("2026-01-26T00:00:00");
   const worklogInfo = getWorklogDate(semesterStart);

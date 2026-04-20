@@ -18,9 +18,8 @@ const Welcome = () => {
   const worklogEdit = useAtomValue(worklogEditAtom);
   const setWorklogEdit = useSetAtom(worklogEditAtom);
   const displayName =
-    userInfo?.preferredName?.trim() ||
+    userInfo?.preferredName?.trim()?.split(" ")[0] ||
     userInfo?.name?.split(" ")[0] ||
-    userInfo?.email ||
     "there";
 
   const worklogdayInfo = getWorklogDate(SEMESTER_START);

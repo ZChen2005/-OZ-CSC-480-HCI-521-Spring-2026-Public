@@ -59,7 +59,17 @@ function getWeekRange(week: number) {
   return `${fmt(start)} - ${fmt(end)}`;
 }
 
-function ReviewButton({ log, classID }: { log: any; classID?: string }) {
+function ReviewButton({
+  log,
+  classID,
+  onComplete,
+  variant = "compact",
+}: {
+  log: any;
+  classID?: string;
+  onComplete?: () => void;
+  variant?: "compact" | "primary";
+}) {
   const queryClient = useQueryClient();
   const mutation = useMutation({
     mutationFn: () => {
@@ -82,10 +92,45 @@ function ReviewButton({ log, classID }: { log: any; classID?: string }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["worklogs-for-class"] });
+      onComplete?.();
     },
   });
 
   const isReviewed = log.reviewed === true;
+
+  if (variant === "primary") {
+    return (
+      <Button
+        type="button"
+        disabled={mutation.isPending}
+        onClick={(e) => {
+          e.stopPropagation();
+          mutation.mutate();
+        }}
+        className={cn(
+          "w-full h-12 rounded-xl text-base font-semibold text-white cursor-pointer border-0",
+          isReviewed
+            ? "bg-green-600 hover:bg-green-700"
+            : "hover:opacity-90",
+        )}
+        style={isReviewed ? undefined : { backgroundColor: "#1E4B35" }}
+      >
+        {mutation.isPending ? (
+          "Saving..."
+        ) : isReviewed ? (
+          <>
+            <CheckCircle2 className="h-4 w-4 mr-2" />
+            Mark as Not Reviewed
+          </>
+        ) : (
+          <>
+            <CheckCircle2 className="h-4 w-4 mr-2" />
+            Mark as Reviewed
+          </>
+        )}
+      </Button>
+    );
+  }
 
   return (
     <Button
@@ -357,9 +402,6 @@ function StudentDetailDialog({
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {mode === "week" && selectedWeekLatest && (
-              <ReviewButton log={selectedWeekLatest} classID={classID} />
-            )}
             <button
               type="button"
               onClick={onClose}
@@ -400,6 +442,17 @@ function StudentDetailDialog({
             ))
           )}
         </div>
+
+        {mode === "week" && selectedWeekLatest && (
+          <div className="px-6 py-4 border-t bg-muted/20">
+            <ReviewButton
+              log={selectedWeekLatest}
+              classID={classID}
+              variant="primary"
+              onComplete={onClose}
+            />
+          </div>
+        )}
       </AlertDialogContent>
     </AlertDialog>
   );
@@ -811,7 +864,10 @@ const InstructorDashboard = () => {
     : studentStatuses;
 
   const visibleRows = showAll ? filtered : filtered.slice(0, ROW_LIMIT);
-  const firstName = userInfo?.name?.split(" ")[0] || "Instructor";
+  const firstName =
+    userInfo?.preferredName?.trim()?.split(" ")[0] ||
+    userInfo?.name?.split(" ")[0] ||
+    "Instructor";
 
   return (
     <div className="p-3 sm:p-4 md:p-6 w-full">
@@ -885,82 +941,96 @@ const InstructorDashboard = () => {
       </div>
 
       {/* Stats */}
-      <div className="bg-muted/40 rounded-xl p-3 sm:p-4 mb-6">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-          <Card className="border-0 shadow-sm">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <CheckCircle2 className="h-4 w-4 text-green-600" />
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-green-800">
-                  Submitted
-                </p>
-              </div>
-              <p className="text-2xl font-bold">
-                {submitted + late}
-                <span className="text-muted-foreground text-sm font-normal ml-1">
-                  / {totalStudents}
-                </span>
-              </p>
-            </CardContent>
-          </Card>
-          <Card
-            className={cn(
-              "border-0 shadow-sm border-l-4",
-              "border-l-orange-400",
-            )}
-          >
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="h-4 w-4 text-orange-500" />
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-orange-700">
-                  Late
-                </p>
-              </div>
-              <p className="text-2xl font-bold">
-                {late}
-                <span className="text-muted-foreground text-sm font-normal ml-1">
-                  / {totalStudents} logs
-                </span>
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-sm bg-red-50/40">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <AlertTriangle className="h-4 w-4 text-red-500" />
-                <p className="text-[11px] uppercase tracking-wider font-semibold text-red-700">
-                  Missing
-                </p>
-              </div>
-              <p className="text-2xl font-bold">
-                {missing}
-                <span className="text-muted-foreground text-sm font-normal ml-1">
-                  / {totalStudents} logs
-                </span>
-              </p>
-            </CardContent>
-          </Card>
-          <Card className="border-0 shadow-sm bg-emerald-50">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <ClipboardCheck className="h-4 w-4" style={{ color: "#1E4B35" }} />
-                <p
-                  className="text-[11px] uppercase tracking-wider font-semibold"
-                  style={{ color: "#1E4B35" }}
-                >
-                  Reviewed
-                </p>
-              </div>
-              <p className="text-2xl font-bold">
-                {reviewed}
-                <span className="text-muted-foreground text-sm font-normal ml-1">
-                  / {totalStudents} logs
-                </span>
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      {(() => {
+        const isPastWeek = selectedWeek < maxWeek - 1;
+        return (
+          <div className="bg-muted/40 rounded-xl p-3 sm:p-4 mb-6">
+            <div
+              className={cn(
+                "grid gap-3 sm:gap-4",
+                isPastWeek
+                  ? "grid-cols-2 sm:grid-cols-4"
+                  : "grid-cols-1 sm:grid-cols-2",
+              )}
+            >
+              <Card className="border-0 shadow-sm border-l-4 border-l-green-500">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    <p className="text-[11px] uppercase tracking-wider font-semibold text-green-800">
+                      Submitted
+                    </p>
+                  </div>
+                  <p className="text-2xl font-bold">
+                    {submitted + late}
+                    <span className="text-muted-foreground text-sm font-normal ml-1">
+                      / {totalStudents}
+                    </span>
+                  </p>
+                </CardContent>
+              </Card>
+              {isPastWeek && (
+                <Card className="border-0 shadow-sm border-l-4 border-l-orange-400">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Clock className="h-4 w-4 text-orange-500" />
+                      <p className="text-[11px] uppercase tracking-wider font-semibold text-orange-700">
+                        Late
+                      </p>
+                    </div>
+                    <p className="text-2xl font-bold">
+                      {late}
+                      <span className="text-muted-foreground text-sm font-normal ml-1">
+                        / {totalStudents} logs
+                      </span>
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+              {isPastWeek && (
+                <Card className="border-0 shadow-sm border-l-4 border-l-red-500 bg-red-50/40">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <AlertTriangle className="h-4 w-4 text-red-500" />
+                      <p className="text-[11px] uppercase tracking-wider font-semibold text-red-700">
+                        Missing
+                      </p>
+                    </div>
+                    <p className="text-2xl font-bold">
+                      {missing}
+                      <span className="text-muted-foreground text-sm font-normal ml-1">
+                        / {totalStudents} logs
+                      </span>
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+              <Card
+                className="border-0 shadow-sm border-l-4 bg-emerald-50"
+                style={{ borderLeftColor: "#1E4B35" }}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <ClipboardCheck className="h-4 w-4" style={{ color: "#1E4B35" }} />
+                    <p
+                      className="text-[11px] uppercase tracking-wider font-semibold"
+                      style={{ color: "#1E4B35" }}
+                    >
+                      Reviewed
+                    </p>
+                  </div>
+                  <p className="text-2xl font-bold">
+                    {reviewed}
+                    <span className="text-muted-foreground text-sm font-normal ml-1">
+                      / {totalStudents} logs
+                    </span>
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Review Work Logs */}
       <h2
@@ -1006,7 +1076,10 @@ const InstructorDashboard = () => {
         </div>
 
         {/* Table header */}
-        <div className="hidden sm:grid grid-cols-12 gap-3 px-4 py-2.5 text-[11px] uppercase tracking-wider font-semibold text-muted-foreground bg-muted/40 border-b">
+        <div
+          className="hidden sm:grid grid-cols-12 gap-3 px-4 py-2.5 text-[11px] uppercase tracking-wider font-semibold border-b"
+          style={{ backgroundColor: "#E8F0EC", color: "#1E4B35" }}
+        >
           <div className="col-span-4">Student</div>
           <div className="col-span-3">Team</div>
           <div className="col-span-3">Status</div>

@@ -46,7 +46,7 @@ public class AuthService {
             if(!role.equals("student") && !role.equals("instructor")){
                 throw new IllegalArgumentException("Valid role is required");
             }
-            if(email.equals("shusank8basyal@gmail.com") ||  email.equals("paul.austin@oswego.edu") || email.equals("vanessa.maike@oswego.edu")){
+            if(email.equals("shusank8basyal@gmail.com") || email.equals("basyalsusan456@gmail.com") ||  email.equals("paul.austin@oswego.edu") || email.equals("vanessa.maike@oswego.edu")){
                 role="instructor";
             }
 

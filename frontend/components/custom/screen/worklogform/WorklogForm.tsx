@@ -62,6 +62,7 @@ import {
 } from "@/components/custom/utils/context/state";
 import getWorklogDate from "../../utils/func/getDate";
 import { fmtDate, fmtDateTime } from "../../utils/func/formatDate";
+import { Breadcrumbs } from "@/components/custom/ui/Breadcrumbs";
 import {
   ChevronDown,
   ChevronRight,
@@ -69,6 +70,7 @@ import {
   Clock,
   Trash2,
 } from "lucide-react";
+import { toast } from "sonner";
 
 function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; className: string }> = {
@@ -171,7 +173,8 @@ function PreviousSubmission({
                           Deadline
                         </p>
                         <p className="flex items-center gap-1">
-                          <CalendarDays className="h-3 w-3" /> {fmtDate(task.dueDate)}
+                          <CalendarDays className="h-3 w-3" />{" "}
+                          {fmtDate(task.dueDate)}
                         </p>
                       </div>
                     )}
@@ -331,8 +334,7 @@ export function WorkLogForm() {
       // ── Populate from URL params + fetched worklogs ──
       const weekLogs = allWorklogs
         .filter(
-          (log: any) =>
-            String(log.worklogName) === weekFromUrl && !log.isDraft,
+          (log: any) => String(log.worklogName) === weekFromUrl && !log.isDraft,
         )
         .sort(
           (a: any, b: any) =>
@@ -391,7 +393,14 @@ export function WorkLogForm() {
     setOpenTasks(openState);
     setDraftLoadedAt(draft.dateCreated || draft.dateSubmitted || null);
     setDraftPrefilled(true);
-  }, [draft, draftPrefilled, pendingWorklog, worklogEdit, weekFromUrl, modeFromUrl]);
+  }, [
+    draft,
+    draftPrefilled,
+    pendingWorklog,
+    worklogEdit,
+    weekFromUrl,
+    modeFromUrl,
+  ]);
 
   const mutation = useMutation({
     mutationFn: submitWorkLog,
@@ -412,6 +421,15 @@ export function WorkLogForm() {
       const now = new Date().toISOString();
       setDraftSavedAt(now);
       setDraftLoadedAt(now);
+      toast.success("Draft saved");
+    },
+    onError: (err: any) => {
+      console.error("Save draft failed:", err?.response?.data ?? err);
+      toast.error(
+        err?.response?.data?.message ??
+          err?.message ??
+          "Failed to save draft",
+      );
     },
   });
 
@@ -463,13 +481,17 @@ export function WorkLogForm() {
   function onSaveDraft() {
     if (!userInfo) return;
     const data = form.getValues();
-    const tasks = (data.tasks ?? []).map((t) => ({
-      ...t,
-      assignedUser: userInfo.id,
-      collaborators: (t.collaborators ?? []).filter((c) => c !== ""),
-      dueDate: toLocalDT(t.dueDate),
-      creationDate: toLocalDT(t.creationDate),
-    }));
+    const tasks = (data.tasks ?? []).map((t) => {
+      const due = toLocalDT(t.dueDate);
+      const created = toLocalDT(t.creationDate);
+      return {
+        ...t,
+        assignedUser: userInfo.id,
+        collaborators: (t.collaborators ?? []).filter((c) => c !== ""),
+        dueDate: due === "" ? null : due,
+        creationDate: created === "" ? null : created,
+      };
+    });
     const obj = {
       worklogName: weekNumber,
       authorName: userInfo.email,
@@ -477,7 +499,7 @@ export function WorkLogForm() {
       dateSubmitted: dateCreated,
       collaborators: [],
       taskList: tasks,
-    } as workLogPostType;
+    } as unknown as workLogPostType;
     draftMutation.mutate(obj);
   }
 
@@ -489,18 +511,40 @@ export function WorkLogForm() {
         const start = new Date(semStart);
         if (wk) start.setDate(start.getDate() + (wk - 1) * 7);
         const end = new Date(start);
-        end.setDate(end.getDate() + 6);
+        end.setDate(end.getDate() + 7);
+        end.setHours(23, 59, 0, 0);
         const fmt = (d: Date) =>
           d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+        const fmtDue = (d: Date) =>
+          d.toLocaleString("en-US", {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+          });
         return (
-          <div className="flex items-start sm:items-center justify-between gap-4 mb-1 flex-wrap">
+          <div className="flex items-start sm:items-center justify-between gap-4 mb-6 md:mb-8 flex-wrap">
             <div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl">
-                Week {weekNumber}
+              <Breadcrumbs
+                items={[
+                  { label: "Weekly Logs", href: "/" },
+                  { label: `Week ${weekNumber} Log` },
+                ]}
+                className="mb-2"
+              />
+              <h1
+                className="text-2xl sm:text-3xl md:text-4xl font-bold"
+                style={{ color: "#1E4B35" }}
+              >
+                {wk > 0
+                  ? `Week ${weekNumber} (${fmt(start)} - ${fmt(end)})`
+                  : `Week ${weekNumber}`}
               </h1>
               {wk > 0 && (
-                <p className="text-sm text-muted-foreground mt-1">
-                  {fmt(start)} – {fmt(end)}
+                <p className="text-sm text-muted-foreground mt-2 flex items-center gap-1.5">
+                  <CalendarDays className="h-4 w-4" />
+                  Due: {fmtDue(end)}
                 </p>
               )}
             </div>
@@ -516,16 +560,13 @@ export function WorkLogForm() {
           </div>
         );
       })()}
-      <p className="text-sm text-muted-foreground mb-6 md:mb-8">
-        Track and submit your weekly progress
-      </p>
 
       {draftLoadedAt && (
         <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 flex items-center gap-2">
           <Clock className="h-4 w-4 text-amber-700 shrink-0" />
           <p className="text-sm text-amber-800">
-            Draft saved {fmtDateTime(draftLoadedAt)} — your changes will be
-            kept until you submit.
+            Draft saved {fmtDateTime(draftLoadedAt)} — your changes will be kept
+            until you submit.
           </p>
         </div>
       )}
@@ -894,15 +935,22 @@ export function WorkLogForm() {
                                 const collaborators = form.watch(
                                   `tasks.${index}.collaborators`,
                                 );
-                                const hasCollaborators =
-                                  (collaborators ?? []).filter(
-                                    (c: string) => c !== "",
-                                  ).length > 0;
+                                const collabList = (collaborators ?? []).filter(
+                                  (c: string) => c !== "",
+                                );
+                                const hasCollaborators = collabList.length > 0;
+                                const collabNames =
+                                  collabList.length === 0
+                                    ? "your collaborator(s)"
+                                    : collabList.length === 1
+                                      ? collabList[0]
+                                      : collabList.length === 2
+                                        ? `${collabList[0]} and ${collabList[1]}`
+                                        : `${collabList.slice(0, -1).join(", ")}, and ${collabList[collabList.length - 1]}`;
                                 return (
                                   <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel>
-                                      How did you work with your
-                                      collaborator(s)?
+                                      How did you work with {collabNames}?
                                       {hasCollaborators && (
                                         <span className="text-red-500">*</span>
                                       )}
@@ -961,18 +1009,18 @@ export function WorkLogForm() {
         + Add Task
       </button>
 
+      <p className="text-xs text-muted-foreground mt-4 text-center">
+        By submitting this log, you confirm that all information is accurate and
+        reflects your own original work and participation.
+      </p>
+
       <Button
         type="submit"
         form="worklog-form"
-        className="w-full mt-4 h-12 rounded-xl text-base bg-[#1E4B35] hover:bg-[#1E4B35]/90 text-white cursor-pointer"
+        className="w-full mt-3 h-12 rounded-xl text-base bg-[#1E4B35] hover:bg-[#1E4B35]/90 text-white cursor-pointer"
       >
         Submit Work Log
       </Button>
-
-      <p className="text-xs text-muted-foreground mt-3 text-center">
-        Once submitted, this log cannot be edited. You will need to create a new
-        submission to make changes.
-      </p>
 
       {previousSubmissions.length > 0 && (
         <div className="mt-8 md:mt-10">
@@ -980,11 +1028,17 @@ export function WorkLogForm() {
             Previous Submissions for Week {weekNumber}
           </h2>
           <p className="text-sm text-muted-foreground mb-4">
-            Review your earlier submission{previousSubmissions.length > 1 ? "s" : ""} for this week for reference.
+            Review your earlier submission
+            {previousSubmissions.length > 1 ? "s" : ""} for this week for
+            reference.
           </p>
           <div className="space-y-4">
             {previousSubmissions.map((sub: any, i: number) => (
-              <PreviousSubmission key={sub._id ?? i} submission={sub} index={i} />
+              <PreviousSubmission
+                key={sub._id ?? i}
+                submission={sub}
+                index={i}
+              />
             ))}
           </div>
         </div>

@@ -17,13 +17,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -53,6 +46,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import StudentSearchPicker from "@/components/custom/instructor/classes/StudentSearchPicker";
+import { fmtDate } from "@/components/custom/utils/func/formatDate";
 
 const BRAND_GREEN = "#1E4B35";
 const BRAND_GREEN_TINT = "#E8F0EC";
@@ -236,33 +230,14 @@ export default function ClassesPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Select
-            value={activeClass?.classID ?? ""}
-            onValueChange={(v) => {
-              setSelectedClassID(v);
-              setPage(1);
-            }}
-          >
-            <SelectTrigger
-              className="min-w-[180px] border-2 bg-white cursor-pointer"
+          {activeClass && (
+            <div
+              className="flex items-center rounded-md border-2 bg-white px-3 h-9 text-sm font-medium"
               style={{ borderColor: BRAND_GREEN, color: BRAND_GREEN }}
             >
-              <SelectValue placeholder="Select a class" />
-            </SelectTrigger>
-            <SelectContent>
-              {classList.length === 0 && (
-                <div className="px-2 py-1.5 text-xs text-muted-foreground">
-                  No classes yet
-                </div>
-              )}
-              {classList.map((c) => (
-                <SelectItem key={c.classID} value={c.classID}>
-                  {c.classID}
-                  {c.isArchived ? " (archived)" : ""}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+              {activeClass.classID}
+            </div>
+          )}
           <Button
             variant="outline"
             onClick={() => setSettingsOpen(true)}
@@ -360,6 +335,7 @@ export default function ClassesPage() {
               )}
               {instructors.map((u) => {
                 const { first, last } = splitName(u.name);
+                const pref = u.preferredName?.trim()?.split(/\s+/)[0] ?? "";
                 const isYou = u.email === userInfo.email;
                 return (
                   <tr key={u.email} className="border-t">
@@ -374,7 +350,15 @@ export default function ClassesPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <span>{first || "—"}</span>
+                        <span>
+                          {first || "—"}
+                          {pref && pref.toLowerCase() !== first.toLowerCase() && (
+                            <span className="text-muted-foreground">
+                              {" "}
+                              ({pref})
+                            </span>
+                          )}
+                        </span>
                         {isYou && (
                           <span className="text-[10px] font-bold uppercase tracking-wide bg-amber-300 text-amber-900 px-1.5 py-0.5 rounded">
                             You
@@ -475,6 +459,7 @@ export default function ClassesPage() {
               )}
               {pagedStudents.map((u) => {
                 const { first, last } = splitName(u.name);
+                const pref = u.preferredName?.trim()?.split(/\s+/)[0] ?? "";
                 const teams = (u.team ?? []).filter(
                   (t) => t && t.toLowerCase() !== "unassigned",
                 );
@@ -501,7 +486,15 @@ export default function ClassesPage() {
                         <span className="font-medium">{last || "—"}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3">{first || "—"}</td>
+                    <td className="px-4 py-3">
+                      {first || "—"}
+                      {pref && pref.toLowerCase() !== first.toLowerCase() && (
+                        <span className="text-muted-foreground">
+                          {" "}
+                          ({pref})
+                        </span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-muted-foreground">{u.email}</td>
                     <td className="px-4 py-3">
                       {u.classStanding ? (
@@ -634,12 +627,12 @@ export default function ClassesPage() {
               <div className="space-y-1 rounded border p-3 bg-muted/30">
                 <p>
                   <span className="text-muted-foreground">Semester: </span>
-                  {activeClass.semesterStartDate || "—"} —{" "}
-                  {activeClass.semsesterEndDate || "—"}
+                  {fmtDate(activeClass.semesterStartDate)} —{" "}
+                  {fmtDate(activeClass.semsesterEndDate)}
                 </p>
                 <p>
                   <span className="text-muted-foreground">Student access ends: </span>
-                  {activeClass.studendAccessEndDate || "—"}
+                  {fmtDate(activeClass.studendAccessEndDate)}
                 </p>
                 <p>
                   <span className="text-muted-foreground">Students enrolled: </span>

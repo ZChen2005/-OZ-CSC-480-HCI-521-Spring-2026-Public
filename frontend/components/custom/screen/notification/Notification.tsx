@@ -317,8 +317,8 @@ export const Notification = () => {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-5">
-        <Card className="border py-0 shadow-none rounded-xl overflow-hidden">
+      <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4 sm:mb-5 w-full md:w-3/4">
+        <Card className="border border-l-4 border-l-green-500 py-0 shadow-none rounded-xl overflow-hidden">
           <CardContent className="p-2.5 sm:py-3 sm:px-4 text-center bg-green-50">
             <p className="text-xs sm:text-sm text-green-900 flex items-center justify-center gap-1.5 mb-1 font-medium">
               <CheckCircle2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-700 shrink-0" />
@@ -332,7 +332,7 @@ export const Notification = () => {
             </p>
           </CardContent>
         </Card>
-        <Card className="border py-0 shadow-none rounded-xl overflow-hidden">
+        <Card className="border border-l-4 border-l-orange-400 py-0 shadow-none rounded-xl overflow-hidden">
           <CardContent className="p-2.5 sm:py-3 sm:px-4 text-center bg-orange-50">
             <p className="text-xs sm:text-sm text-orange-900 flex items-center justify-center gap-1.5 mb-1 font-medium">
               <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-orange-600 shrink-0" />
@@ -346,7 +346,7 @@ export const Notification = () => {
             </p>
           </CardContent>
         </Card>
-        <Card className="border py-0 shadow-none rounded-xl overflow-hidden">
+        <Card className="border border-l-4 border-l-red-500 py-0 shadow-none rounded-xl overflow-hidden">
           <CardContent className="p-2.5 sm:py-3 sm:px-4 text-center bg-red-50">
             <p className="text-xs sm:text-sm text-red-900 flex items-center justify-center gap-1.5 mb-1 font-medium">
               <Hourglass className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600 shrink-0" />
@@ -403,12 +403,24 @@ export const Notification = () => {
                     : `Deadline in ${entry.daysUntilDue} days.`
                 : null;
 
+            const borderLeftColor =
+              entry.status === "submitted"
+                ? "border-l-green-500"
+                : entry.status === "late"
+                  ? "border-l-orange-400"
+                  : entry.status === "missing"
+                    ? "border-l-red-500"
+                    : entry.status === "current"
+                      ? "border-l-amber-400"
+                      : "border-l-gray-300";
+
             return (
               <div
                 key={entry.week}
                 onClick={() => handleWeekClick(entry)}
                 className={cn(
-                  "flex gap-3 items-center rounded-xl border bg-white p-3 sm:p-4 transition-colors cursor-pointer hover:bg-gray-50",
+                  "flex gap-3 items-center rounded-xl border border-l-4 bg-white p-4 sm:p-5 min-h-[88px] sm:min-h-[100px] transition-colors cursor-pointer hover:bg-gray-50",
+                  borderLeftColor,
                   isCurrent && "bg-amber-50 border-amber-300 hover:bg-amber-100",
                   isMissing && "bg-red-50/50 border-red-200 hover:bg-red-50",
                 )}

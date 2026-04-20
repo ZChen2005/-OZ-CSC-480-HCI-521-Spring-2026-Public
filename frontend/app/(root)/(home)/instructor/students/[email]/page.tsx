@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAtomValue } from "jotai";
 import { userAtom } from "@/components/custom/utils/context/state";
-import { getClasses } from "@/components/custom/utils/api_utils/req/class";
+import { getAllUsers, getClasses } from "@/components/custom/utils/api_utils/req/class";
 import {
   getWorklogsForClass,
   updateWorklog,
@@ -33,6 +33,7 @@ import {
 import getWorklogDate from "@/components/custom/utils/func/getDate";
 import { fmtDate, fmtDateTime } from "@/components/custom/utils/func/formatDate";
 import { cn } from "@/lib/utils";
+import { Breadcrumbs } from "@/components/custom/ui/Breadcrumbs";
 
 const SEMESTER_START = new Date("2026-01-26T00:00:00");
 const ACCENT_GREEN = "#1E4B35";
@@ -444,8 +445,10 @@ function WeekRowItem({
 export default function StudentHistoryPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const userInfo = useAtomValue(userAtom);
   const emailParam = decodeURIComponent(String(params?.email ?? ""));
+  const classIDFromQuery = searchParams?.get("classID") ?? "";
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -455,11 +458,11 @@ export default function StudentHistoryPage() {
   const { data: classesData } = useQuery({
     queryKey: ["classes"],
     queryFn: getClasses,
-    enabled: userInfo?.role === "instructor",
+    enabled: userInfo?.role === "instructor" && !classIDFromQuery,
   });
   const activeClass =
     (classesData ?? []).find((c: any) => !c.isArchived) ?? null;
-  const activeClassID = activeClass?.classID ?? "";
+  const activeClassID = classIDFromQuery || (activeClass?.classID ?? "");
 
   const { data: worklogsData } = useQuery({
     queryKey: ["worklogs-for-class", activeClassID],
@@ -470,6 +473,11 @@ export default function StudentHistoryPage() {
     queryKey: ["users-from-class", activeClassID],
     queryFn: () => getUsersFromClass(activeClassID),
     enabled: !!activeClassID,
+  });
+  const { data: allUsersData } = useQuery({
+    queryKey: ["all-users"],
+    queryFn: getAllUsers,
+    enabled: userInfo?.role === "instructor",
   });
 
   if (!mounted || !userInfo)
@@ -482,21 +490,10 @@ export default function StudentHistoryPage() {
     );
   if (!activeClassID) return <p className="p-4 sm:p-10">No active class.</p>;
 
-  const student = (usersData ?? []).find((u: any) => u.email === emailParam);
-  if (!student) {
-    return (
-      <div className="p-4 sm:p-6 md:p-10">
-        <Link href="/instructor">
-          <Button variant="ghost" className="mb-4 gap-2 cursor-pointer">
-            <ArrowLeft className="h-4 w-4" /> Back
-          </Button>
-        </Link>
-        <p className="text-muted-foreground">
-          Student not found in active class.
-        </p>
-      </div>
-    );
-  }
+  const student =
+    (usersData ?? []).find((u: any) => u.email === emailParam) ??
+    (allUsersData ?? []).find((u: any) => u.email === emailParam) ??
+    { email: emailParam, name: emailParam, role: "student", team: [] };
 
   const studentLogs = (worklogsData ?? []).filter(
     (l: any) => l.authorName === emailParam && !l.isDraft,
@@ -527,26 +524,23 @@ export default function StudentHistoryPage() {
 
   return (
     <div className="p-3 sm:p-4 md:p-6 w-full">
-      {/* Top nav */}
-      <div className="flex items-center gap-3 mb-4 text-sm">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground cursor-pointer"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back
-        </button>
-        <span className="text-muted-foreground">·</span>
-        <Link
-          href="/instructor"
-          className="text-muted-foreground hover:text-foreground"
-        >
-          Manage Class
-        </Link>
-        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />
-        <span className="font-medium">{student.name}</span>
-      </div>
+      <Breadcrumbs
+        items={
+          classIDFromQuery
+            ? [
+                { label: "Archived Classes", href: "/instructor/archived" },
+                {
+                  label: classIDFromQuery,
+                  href: `/instructor/archived/${encodeURIComponent(classIDFromQuery)}`,
+                },
+                { label: student.name || student.email },
+              ]
+            : [
+                { label: "Dashboard", href: "/instructor" },
+                { label: student.name || student.email },
+              ]
+        }
+      />
 
       {/* Hero */}
       <Card className="mb-6 border-0 shadow-sm bg-emerald-50/60 overflow-hidden">

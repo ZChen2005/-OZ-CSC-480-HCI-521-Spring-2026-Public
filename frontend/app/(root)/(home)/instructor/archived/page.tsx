@@ -21,7 +21,6 @@ import {
 import { Calendar, ChevronRight, FileText } from "lucide-react";
 
 const BRAND_GREEN = "#1E4B35";
-const BRAND_GREEN_TINT = "#E8F0EC";
 
 function fmtDate(s: string | undefined): string {
   if (!s) return "—";
@@ -138,33 +137,23 @@ export default function ArchivedClassPage() {
 
   return (
     <div className="p-3 sm:p-4 md:p-6 w-full">
-      <Link href="/instructor">
-        <button className="mb-3 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground cursor-pointer">
-          ← Back
-        </button>
-      </Link>
 
-      <div
-        className="rounded-2xl px-5 sm:px-6 py-5 sm:py-6 mb-6 flex items-center gap-3"
-        style={{ backgroundColor: BRAND_GREEN_TINT }}
-      >
-        <span
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border-2 bg-white shadow-sm"
-          style={{ borderColor: BRAND_GREEN }}
+      <div className="mb-4 sm:mb-5">
+        <h1
+          className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight mb-1 flex items-center gap-2.5"
+          style={{ color: BRAND_GREEN }}
         >
-          <FileText className="h-6 w-6" style={{ color: BRAND_GREEN }} />
-        </span>
-        <div>
-          <h1
-            className="text-2xl sm:text-3xl font-bold tracking-tight"
-            style={{ color: BRAND_GREEN }}
+          <span
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border-2 bg-white shadow-sm"
+            style={{ borderColor: BRAND_GREEN }}
           >
-            Archived Classes
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            View work logs from previous classes
-          </p>
-        </div>
+            <FileText className="h-5 w-5" style={{ color: BRAND_GREEN }} aria-hidden />
+          </span>
+          Archived Classes
+        </h1>
+        <p className="text-xs sm:text-sm text-muted-foreground pl-0 sm:pl-[46px]">
+          View work logs from previous classes
+        </p>
       </div>
 
       <div className="flex items-center justify-between mb-3 gap-3 flex-wrap">

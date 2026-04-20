@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { fmtDate, fmtDateTime } from "@/components/custom/utils/func/formatDate";
 import { Suspense, useEffect, useState } from "react";
+import { Breadcrumbs } from "@/components/custom/ui/Breadcrumbs";
 
 const statusLabel: Record<string, string> = {
   "not-started": "Not Started",
@@ -130,20 +131,11 @@ function ReviewContent() {
     queryFn: () => getWorkLog(userInfo?.email),
   });
 
-  const { data: draft } = useQuery({
+  const { data: draft, isLoading: draftLoading } = useQuery({
     queryKey: ["worklog-draft", userInfo?.email, weekNum],
     enabled: !!userInfo?.email && !!weekNum,
     queryFn: () => getDraftForWeek(userInfo?.email, weekNum ?? undefined),
   });
-
-  if (isLoading) return <p className="p-6">Loading...</p>;
-  if (error) return (
-    <div className="p-6">
-      <p className="text-red-600 font-medium">Failed to load worklogs</p>
-      <p className="text-sm text-muted-foreground mt-1">{(error as any)?.message}</p>
-    </div>
-  );
-  if (!weekNum) return <p className="p-6">No week specified.</p>;
 
   const worklogs = data ?? [];
   const weekSubmissions = worklogs
@@ -155,6 +147,32 @@ function ReviewContent() {
       (a: any, b: any) =>
         new Date(b.dateSubmitted).getTime() - new Date(a.dateSubmitted).getTime(),
     );
+
+  const shouldRedirectToDraft =
+    !isLoading &&
+    !draftLoading &&
+    !!weekNum &&
+    weekSubmissions.length === 0 &&
+    !!draft;
+
+  useEffect(() => {
+    if (shouldRedirectToDraft) {
+      router.replace(`/worklogs?week=${weekNum}&mode=new`);
+    }
+  }, [shouldRedirectToDraft, router, weekNum]);
+
+  if (isLoading || draftLoading) return <p className="p-6">Loading...</p>;
+  if (error) return (
+    <div className="p-6">
+      <p className="text-red-600 font-medium">Failed to load worklogs</p>
+      <p className="text-sm text-muted-foreground mt-1">{(error as any)?.message}</p>
+    </div>
+  );
+  if (!weekNum) return <p className="p-6">No week specified.</p>;
+
+  if (shouldRedirectToDraft) {
+    return <p className="p-6">Opening draft...</p>;
+  }
 
   if (weekSubmissions.length === 0 && !draft) {
     return (
@@ -190,16 +208,12 @@ function ReviewContent() {
 
   return (
     <div className="p-4 sm:p-6 md:p-8 w-full">
-      <div className="flex items-center gap-3 mb-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="gap-1.5"
-          onClick={() => router.push("/notifications")}
-        >
-          <ArrowLeft className="h-4 w-4" /> Back
-        </Button>
-      </div>
+      <Breadcrumbs
+        items={[
+          { label: "Weekly Logs", href: "/" },
+          { label: `Week ${weekNum} Log` },
+        ]}
+      />
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
