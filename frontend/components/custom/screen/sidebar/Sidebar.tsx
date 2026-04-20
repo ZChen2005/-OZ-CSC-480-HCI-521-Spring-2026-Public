@@ -87,10 +87,12 @@ export function AppSidebar() {
             LakerTracks
           </p>
           <p className="text-lg font-semibold text-white leading-tight">
-            {userInfo?.role === "instructor" ? "Instructor Portal" : "Student Hub"}
+            {userInfo?.role === "instructor"
+              ? "Instructor Portal"
+              : "Student Hub"}
           </p>
           <p className="text-xs text-white/70 leading-tight pt-0.5">
-            HCI 521 | Spring 2026
+            CSC 480 | HCI 521
           </p>
         </SidebarGroup>
 

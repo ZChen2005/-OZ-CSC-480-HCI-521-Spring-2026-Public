@@ -281,6 +281,17 @@ export function Profile() {
                 <FieldLabel>Email</FieldLabel>
                 <Input value={userInfo.email} disabled readOnly />
               </Field>
+
+              {isStudent && (
+                <Field>
+                  <FieldLabel>Class</FieldLabel>
+                  <Input
+                    value={userInfo.classID || "Not enrolled"}
+                    disabled
+                    readOnly
+                  />
+                </Field>
+              )}
             </div>
           </div>
         </CardContent>
