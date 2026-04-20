@@ -84,7 +84,7 @@ export function AppSidebar() {
       <SidebarContent className="m-5 mt-10 text-white overflow-x-hidden">
         <SidebarGroup className="mx-3 mt-4 mb-6 space-y-0.5">
           <p className="text-2xl font-bold text-amber-400 leading-tight">
-            LakerTracks
+            LakerLogs
           </p>
           <p className="text-lg font-semibold text-white leading-tight">
             {userInfo?.role === "instructor"
