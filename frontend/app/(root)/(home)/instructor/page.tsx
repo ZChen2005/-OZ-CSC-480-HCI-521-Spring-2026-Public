@@ -713,8 +713,7 @@ const InstructorDashboard = () => {
         <Card>
           <CardContent className="text-center py-12">
             <p className="text-muted-foreground mb-4">
-              No active class. Create a new class or unarchive an existing one
-              to view your dashboard.
+              No active class. Create a new class.
             </p>
             <Link href="/instructor/classes">
               <Button variant="outline" className="gap-2 cursor-pointer">
