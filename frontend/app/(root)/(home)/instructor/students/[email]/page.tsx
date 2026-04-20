@@ -37,6 +37,12 @@ import { cn } from "@/lib/utils";
 const SEMESTER_START = new Date("2026-01-26T00:00:00");
 const ACCENT_GREEN = "#1E4B35";
 
+function calendarDaysBetween(from: Date, to: Date): number {
+  const a = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  const b = new Date(to.getFullYear(), to.getMonth(), to.getDate());
+  return Math.round((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 type WeekStatus = "submitted" | "late" | "missing" | "current" | "upcoming";
 
 interface WeekRow {
@@ -86,9 +92,7 @@ function buildWeekRows(studentLogs: any[], currentWeek: number): WeekRow[] {
     const logs = logsByWeek.get(w) ?? [];
     const latest = logs[0] ?? null;
     const reviewed = latest?.reviewed === true;
-    const daysUntilDue = Math.ceil(
-      (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-    );
+    const daysUntilDue = calendarDaysBetween(now, dueDate);
 
     if (w > currentWeek) {
       rows.push({
@@ -103,9 +107,7 @@ function buildWeekRows(studentLogs: any[], currentWeek: number): WeekRow[] {
     } else if (w === currentWeek) {
       if (latest) {
         const submitted = new Date(latest.dateSubmitted);
-        const diff = Math.floor(
-          (submitted.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24),
-        );
+        const diff = calendarDaysBetween(dueDate, submitted);
         rows.push({
           week: w,
           dueDate,
@@ -128,9 +130,7 @@ function buildWeekRows(studentLogs: any[], currentWeek: number): WeekRow[] {
       }
     } else if (latest) {
       const submitted = new Date(latest.dateSubmitted);
-      const diff = Math.floor(
-        (submitted.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24),
-      );
+      const diff = calendarDaysBetween(dueDate, submitted);
       rows.push({
         week: w,
         dueDate,
@@ -141,9 +141,7 @@ function buildWeekRows(studentLogs: any[], currentWeek: number): WeekRow[] {
         reviewed,
       });
     } else {
-      const overdueDays = Math.floor(
-        (now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24),
-      );
+      const overdueDays = calendarDaysBetween(dueDate, now);
       rows.push({
         week: w,
         dueDate,

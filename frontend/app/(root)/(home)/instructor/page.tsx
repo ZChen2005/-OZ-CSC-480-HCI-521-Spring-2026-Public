@@ -43,6 +43,12 @@ import { cn } from "@/lib/utils";
 
 const semesterStart = new Date("2026-01-26T00:00:00");
 
+function calendarDaysBetween(from: Date, to: Date): number {
+  const a = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  const b = new Date(to.getFullYear(), to.getMonth(), to.getDate());
+  return Math.round((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 function getWeekRange(week: number) {
   const start = new Date(semesterStart);
   start.setDate(start.getDate() + (week - 1) * 7);
@@ -427,9 +433,7 @@ function WeekSection({
   let lateDays = 0;
   if (latestLog) {
     const submitted = new Date(latestLog.dateSubmitted);
-    const diff = Math.floor(
-      (submitted.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24),
-    );
+    const diff = calendarDaysBetween(dueDate, submitted);
     status = diff > 0 ? "late" : "submitted";
     lateDays = diff > 0 ? diff : 0;
   }
@@ -776,9 +780,7 @@ const InstructorDashboard = () => {
 
     if (latestLog) {
       const submitted = new Date(latestLog.dateSubmitted);
-      const diff = Math.floor(
-        (submitted.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24),
-      );
+      const diff = calendarDaysBetween(dueDate, submitted);
       status = diff > 0 ? "late" : "submitted";
       lateDays = diff > 0 ? diff : 0;
     }

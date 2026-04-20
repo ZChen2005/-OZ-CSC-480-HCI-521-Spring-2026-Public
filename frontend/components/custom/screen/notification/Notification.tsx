@@ -42,6 +42,12 @@ interface WeekEntry {
 const accentGreen = "#1E4B35";
 const SEMESTER_START = new Date("2026-01-26T00:00:00");
 
+function calendarDaysBetween(from: Date, to: Date): number {
+  const a = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  const b = new Date(to.getFullYear(), to.getMonth(), to.getDate());
+  return Math.round((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 function buildWeekEntries(
   worklogs: {
     worklogName?: string | number;
@@ -80,9 +86,7 @@ function buildWeekEntries(
     });
 
     const log = submittedMap.get(w);
-    const daysUntilDue = Math.ceil(
-      (dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-    );
+    const daysUntilDue = calendarDaysBetween(now, dueDate);
 
     const hasDraft = draftWeeks.has(w);
 
@@ -98,9 +102,7 @@ function buildWeekEntries(
     } else if (w === currentWeek) {
       if (log && log.dateSubmitted) {
         const submitted = new Date(log.dateSubmitted);
-        const diffDays = Math.floor(
-          (submitted.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24),
-        );
+        const diffDays = calendarDaysBetween(dueDate, submitted);
         entries.push({
           week: w,
           dueDate,
@@ -122,9 +124,7 @@ function buildWeekEntries(
       }
     } else if (log && log.dateSubmitted) {
       const submitted = new Date(log.dateSubmitted);
-      const diffDays = Math.floor(
-        (submitted.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24),
-      );
+      const diffDays = calendarDaysBetween(dueDate, submitted);
       entries.push({
         week: w,
         dueDate,
@@ -135,9 +135,7 @@ function buildWeekEntries(
         hasDraft,
       });
     } else {
-      const overdueDays = Math.floor(
-        (now.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24),
-      );
+      const overdueDays = calendarDaysBetween(dueDate, now);
       entries.push({
         week: w,
         dueDate,

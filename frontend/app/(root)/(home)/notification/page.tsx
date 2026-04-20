@@ -17,6 +17,12 @@ import {
   Bell,
 } from "lucide-react";
 
+function calendarDaysBetween(from: Date, to: Date): number {
+  const a = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  const b = new Date(to.getFullYear(), to.getMonth(), to.getDate());
+  return Math.round((b.getTime() - a.getTime()) / (1000 * 60 * 60 * 24));
+}
+
 function getLateDays(log: any): number {
   const semesterStart = new Date("2026-01-26T00:00:00");
   const week = parseInt(log.worklogName);
@@ -25,9 +31,7 @@ function getLateDays(log: any): number {
   dueDate.setDate(dueDate.getDate() + week * 7);
   dueDate.setHours(23, 59, 0, 0);
   const submitted = new Date(log.dateSubmitted);
-  const diffDays = Math.floor(
-    (submitted.getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24),
-  );
+  const diffDays = calendarDaysBetween(dueDate, submitted);
   return diffDays > 0 ? diffDays : 0;
 }
 
